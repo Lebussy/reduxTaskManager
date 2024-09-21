@@ -1,27 +1,21 @@
-import { useEffect, useState } from "react"
-import taskService from './services/tasks'
+import { useEffect } from "react"
 import TaskForm from "./components/TaskForm"
+import { useDispatch} from "react-redux"
+import { initialiseTasksData} from "./reducers/taskReducer"
+import TasksDisplay from "./components/TasksDisplay"
 
 function App() {
-  const [tasks, setTasks] = useState([])
-
-  // temp controlled taskForm component
-  const [newTask, setNewTask] = useState('')
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    taskService.getTasks().then(taskData => setTasks(taskData))
+    dispatch(initialiseTasksData())
   },[])
-
-  const handleSubmit = async (content) => {
-    const added = await taskService.addTask(content)
-    setTasks(tasks.concat(added))
-  }
 
   return (
     <>
       <div>tasks</div>
-      {tasks.map(task => <div key={task}>{task}</div>)}
-      <TaskForm newTask={newTask} setNewTask={setNewTask} handleSubmit={handleSubmit}/>
+      <TasksDisplay/>
+      <TaskForm/>
     </>
   )
 }

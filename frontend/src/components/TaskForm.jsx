@@ -1,9 +1,17 @@
+import { useDispatch } from "react-redux"
+import { createTask } from "../reducers/taskReducer"
 
+const TaskForm = () => {
+  const dispatch = useDispatch()
 
-const TaskForm = ({ newTask, setNewTask, handleSubmit }) => {
   return (
-    <form onSubmit={() => handleSubmit(newTask)}>
-      <input value={newTask} onChange={(event) => setNewTask(event.target.value)}/>
+    <form onSubmit={(event) => {
+      event.preventDefault()
+      const content = event.target.task.value
+      dispatch(createTask(content))
+      event.target.task.value = ''
+    }}>
+      <input type="text" name="task"/>
       <button type="submit">save</button>
     </form>
   )

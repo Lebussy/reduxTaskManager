@@ -1,0 +1,29 @@
+{
+  "tasks": [
+    {
+      "content": "mvp frontend with redu",
+      "done": false,
+      "id": "one"
+    },
+    {
+      "content": "code the express server to compete with json-server",
+      "done": false,
+      "id": "two"
+    },
+    {
+      "content": "expand the frontend to include authentication",
+      "done": false,
+      "id": "three"
+    },
+    {
+      "id": "92a6",
+      "content": "foo",
+      "done": false
+    },
+    {
+      "id": "6e11",
+      "content": "fooofy?",
+      "done": false
+    }
+  ]
+}
