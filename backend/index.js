@@ -19,19 +19,22 @@ let tasks = [
     content:'write the express server',
     category:'now',
     done: false,
-    id:1
+    id:"1",
+    position: 3
   },
   {
     content:'connect to mongoDB',
     category:'later',
     done: false,
-    id:2
+    id:"2",
+    position: 2
   },
   {
     content:'write the app frontend using redux <3',
     category:'later-later',
     done: false,
-    id:3
+    id:"3",
+    position: 1
   }
 ]
 
@@ -39,8 +42,12 @@ app.get('/api/tasks', (req, res) => {
   res.json(tasks)
 })
 
+const generateId = () => {
+  return Math.ceil(Math.random() * 10000).toString()
+}
+
 app.post('/api/tasks', (req, res) => {
-  const newTask = req.body.content
+  const newTask = {...req.body, id: generateId()}
   tasks.push(newTask)
   res.json(newTask)
 }) 
@@ -56,6 +63,14 @@ app.put('/api/tasks/:id', (req, res) => {
   )
 
   res.json(updatedTask).status(200)
+})
+
+app.delete('/api/tasks/:id', (req, res) => {
+  const id = req.params.id
+  tasks = tasks.filter(task => task.id !== id)
+  
+  console.log(tasks)
+  res.status(204).end()
 })
 
 app.listen(3001, () => {

@@ -1,17 +1,12 @@
-import { useDispatch } from "react-redux"
-import { createTask } from "../reducers/taskReducer"
-
-const TaskForm = () => {
-  const dispatch = useDispatch()
-
+const TaskForm = ({ handleSubmit, preFill = '' }) => {
   return (
     <form onSubmit={(event) => {
       event.preventDefault()
       const content = event.target.task.value
-      dispatch(createTask(content))
+      handleSubmit(content)
       event.target.task.value = ''
     }}>
-      <input type="text" name="task"/>
+      <input defaultValue={preFill} type="text" name="task"/>
       <button type="submit">save</button>
     </form>
   )

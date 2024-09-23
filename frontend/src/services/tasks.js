@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseUrl = 'http://localhost:3001/tasks'
+const baseUrl = 'http://localhost:3001/api/tasks'
 
 const getTasks = async () => {
   const tasks = await axios.get(baseUrl)
@@ -17,4 +17,9 @@ const updateTask = async (updatedTask) => {
   return response.data
 }
 
-export default { getTasks, addTask, updateTask }
+const deleteTask = async (taskId) => {
+  const response = await axios.delete(`${baseUrl}/${taskId}`)
+  return response.status
+}
+
+export default { getTasks, addTask, updateTask, deleteTask }
