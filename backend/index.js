@@ -16,25 +16,34 @@ app.use(reqLogger)
 
 let tasks = [
   {
-    content:'write the express server',
-    category:'now',
+    content:'3 write the express server',
     done: false,
     id:"1",
     position: 3
   },
   {
-    content:'connect to mongoDB',
-    category:'later',
+    content:'2 connect to mongoDB',
     done: false,
     id:"2",
     position: 2
   },
   {
-    content:'write the app frontend using redux <3',
-    category:'later-later',
+    content:'1 write the app frontend using redux <3',
     done: false,
     id:"3",
     position: 1
+  },
+  {
+    content:'4 get the positioning functions working',
+    done: false,
+    id:"4",
+    position: 4
+  },
+  {
+    content:'5 implement the react dnd',
+    done: false,
+    id:"5",
+    position: 5
   }
 ]
 
@@ -52,8 +61,22 @@ app.post('/api/tasks', (req, res) => {
   res.json(newTask)
 }) 
 
+app.put('/api/tasks/batch', (req, res) => {
+  const updatedTasks = req.body;
+
+  updatedTasks.forEach(updatedTask => {
+    tasks = tasks.map(task => task.id !== updatedTask.id ? task : updatedTask);
+  });
+
+  console.log(updatedTasks);
+
+  res.status(200).json(updatedTasks).end();
+})
+
 app.put('/api/tasks/:id', (req, res) => {
-  const id = parseInt(req.params.id)
+  const id = req.params.id
+
+  console.log('foo')
 
   const updatedTask = req.body
 
@@ -69,9 +92,9 @@ app.delete('/api/tasks/:id', (req, res) => {
   const id = req.params.id
   tasks = tasks.filter(task => task.id !== id)
   
-  console.log(tasks)
   res.status(204).end()
 })
+
 
 app.listen(3001, () => {
   console.log("listening on port 3001")

@@ -22,4 +22,10 @@ const deleteTask = async (taskId) => {
   return response.status
 }
 
-export default { getTasks, addTask, updateTask, deleteTask }
+const updateMultiple = async (updatedTasks) => {
+  const response = await axios.put(`${baseUrl}/batch`, updatedTasks)
+  console.log(response.data)
+  return response.data
+}
+
+export default { getTasks, addTask, updateTask, deleteTask, updateMultiple }

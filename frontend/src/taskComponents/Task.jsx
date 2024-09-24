@@ -31,7 +31,7 @@ const Task = ({ task }) => {
           {task.done? 'undo' : 'done'}
         </button>
         {!task.done && renderEditButton()}
-        <button style={buttonStyle} onClick={() => dispatch(deleteTask(task.id))}>
+        <button style={buttonStyle} onClick={() => dispatch(deleteTask(task))}>
           delete
         </button>
       </li>

@@ -6,7 +6,11 @@ const NotDoneTasksDisplay = () => {
     .filter(task => !task.done)
     .toSorted((a,b) => a.position-b.position)
     
-  return <TasksDisplay tasks={notDoneTasks}/>
+  return (
+    <div>
+      <TasksDisplay tasks={notDoneTasks}/>
+    </div>
+  )
 }
 
 export default NotDoneTasksDisplay

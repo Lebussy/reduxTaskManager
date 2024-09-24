@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import taskService from '../services/tasks'
+import taskHelper from './reducerHelpers/tasksHelper'
 
 const taskSlice = createSlice({
   name: 'tasks',
@@ -8,7 +9,7 @@ const taskSlice = createSlice({
     appendTask (state, action) {
       state.push(action.payload)
     },
-    setTasksData (state, action) {
+    setTaskData (state, action) {
       return action.payload
     },
     replaceTask (state, action){
@@ -25,7 +26,7 @@ const taskSlice = createSlice({
 
 // These action creators are exported
 // Components can import and use these action creators using redux dispatch
-export const { appendTask, setTasksData, replaceTask, removeTask } = taskSlice.actions
+export const { appendTask, setTaskData, replaceTask, removeTask } = taskSlice.actions
 
 // These asynchronous action creators return thunks that perform asynchronous operations on the redux store
 export const createTask = (content) => {
@@ -39,26 +40,39 @@ export const createTask = (content) => {
 export const initialiseTasksData = () => {
   return async (dispatch) => {
     const taskData = await taskService.getTasks()
-    dispatch(setTasksData(taskData))
+    dispatch(setTaskData(taskData))
   }
 }
 
 // This action creator returns an asynchronous action, that waits until the server responds with the updated task,
 // Before dispatching an action to the store to update the data
 export const updateTask = (updatedTask) => {
-  console.log('updateTask action creator')
   return async (dispatch) => {
     const returnedTask = await taskService.updateTask(updatedTask)
     dispatch(replaceTask(returnedTask))
   }
 }
 
-export const deleteTask = (taskId) => {
-  return async (dispatch) => {
-    const status = await taskService.deleteTask(taskId)
+export const deleteTask = (task) => {
+  return async (dispatch, getState) => {
+    const status = await taskService.deleteTask(task.id)
     if (status === 204) {
-      dispatch(removeTask(taskId))
+      dispatch(removeTask(task.id))
+      const currentTasks = getState().tasks
+      const tasksToReposition = taskHelper.shiftPositionsUpTo(currentTasks, task.id)
+      tasksToReposition.forEach(task => dispatch(updateTask(task)))
     }
+  }
+}
+
+// Asynchronous action creator that takes a list of tasks, and the position change of a task
+// Uses the task helper to return an array of tasks that change after the position change
+export const changeTaskPosition = (tasks, fromPosition, toPosition) => {
+  const updatedTasks = taskHelper.updateTaskPositions(tasks, fromPosition, toPosition)
+  return async (dispatch) => {
+    const returnedTasks = await taskService.updateMultiple(updatedTasks)
+    // Once the server returns the tasks with the updated positions, each task is replaced by dispatching the replaceTask action
+    returnedTasks.forEach(task => dispatch(replaceTask(task)))
   }
 }
 
