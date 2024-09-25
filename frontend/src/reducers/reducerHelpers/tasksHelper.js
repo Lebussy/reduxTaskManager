@@ -35,10 +35,16 @@ const updateTaskPositions = (tasks, fromPosition, toPosition) => {
   } 
 }
 
-// Takes an array of tasks and the position of a removed task and shifts it up
+// Takes an array of tasks and the position, after which tasks should be shifted up
 // returns an array of the tasks that need updating
-const shiftPositionsUpTo = (tasks, toPosition) => {
-  let tasksToShift = sortedDeepCopy(tasks).slice(toPosition + 1)
+const shiftPositionsUpAfter = (tasks, toPosition) => {
+  console.log('shift positions up to called with', tasks, toPosition)
+
+  const deepCopyAndSorted = sortedDeepCopy(tasks)
+
+  let tasksToShift = deepCopyAndSorted.filter(task => task.position > toPosition)
+
+  console.log('tasksToShift', tasksToShift)
 
   if (tasksToShift.length > 0){
     tasksToShift = tasksToShift.map(task => {
@@ -49,4 +55,4 @@ const shiftPositionsUpTo = (tasks, toPosition) => {
   return tasksToShift
 }
 
-export default { updateTaskPositions, shiftPositionsUpTo }
+export default { updateTaskPositions, shiftPositionsUpAfter }

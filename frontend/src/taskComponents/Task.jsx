@@ -26,7 +26,7 @@ const Task = ({ task }) => {
   if (!isEdit) {
     return (
       <li style={taskStyle}>
-        {task.content + ' '}
+        {task.position + ') ' + task.content + ' '}
         <button style={buttonStyle} onClick={() => dispatch(updateTask({...task, done: !task.done}))}>
           {task.done? 'undo' : 'done'}
         </button>

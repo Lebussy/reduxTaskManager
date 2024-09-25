@@ -1,10 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit";
 import taskService from '../services/tasks'
 import taskHelper from './reducerHelpers/tasksHelper'
+import { addToLastDonePosition, addToLastNotDonePosition, setLastDonePosition, setLastNotDonePosition } from "./positionsReducer";
 
 const taskSlice = createSlice({
   name: 'tasks',
-  initialState: [{content:"initial state", done: false, id: "1234", position: 1}],
+  initialState: [{content:"loading tasks", done: false, id: "1234", position: 1}],
   reducers: {
     appendTask (state, action) {
       state.push(action.payload)
@@ -41,6 +42,10 @@ export const initialiseTasksData = () => {
   return async (dispatch) => {
     const taskData = await taskService.getTasks()
     dispatch(setTaskData(taskData))
+    const doneTasks = taskData.filter(task => task.done)
+    const notDoneTasks = taskData.filter(task => !task.done)
+    dispatch(setLastDonePosition(doneTasks.length))
+    dispatch(setLastNotDonePosition(notDoneTasks.length))
   }
 }
 
@@ -53,14 +58,74 @@ export const updateTask = (updatedTask) => {
   }
 }
 
-export const deleteTask = (task) => {
+export const toggleDone = (taskToToggle) => {
+  // Async action creator for toggling the done state of a task.
   return async (dispatch, getState) => {
-    const status = await taskService.deleteTask(task.id)
-    if (status === 204) {
-      dispatch(removeTask(task.id))
-      const currentTasks = getState().tasks
-      const tasksToReposition = taskHelper.shiftPositionsUpTo(currentTasks, task.id)
-      tasksToReposition.forEach(task => dispatch(updateTask(task)))
+    // Calculates the position of the task in the new list, based on whether the task was in the done or notDone list
+    const lastPositions = getState().positions.lastPositions
+    const nextPosition = (taskToToggle.done ? lastPositions.notDone : lastPositions.done) + 1
+
+    console.log('Next position', nextPosition)
+
+    // Dispatches the task with the toggled done, and updated task position
+    const updatedTask = {...taskToToggle, done: !taskToToggle.done, position: nextPosition}
+    dispatch(updateTask(updatedTask))
+
+
+
+
+
+
+    // For updating the positions in the list that the task was moved from
+
+    const tasksToReposition = getState().tasks.filter(taskToToggle.done !== updatedTask.done)
+
+    const repositionedTasks = taskHelper.shiftPositionsUpAfter(tasksToReposition, taskToToggle.position)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  }
+}
+
+export const deleteTask = (taskToDelete) => {
+  return async (dispatch, getState) => {
+    try {
+      await taskService.deleteTask(taskToDelete.id)
+      dispatch(removeTask(taskToDelete.id))
+
+      // Gets the tasks that need shifting from the same list as the deleted task
+      const tasksInSameList = getState().tasks.filter(currentTask => currentTask.done === taskToDelete.done)
+
+      // Returns the shifted tasks that need updating from that list
+      const repositionedTasks = taskHelper.shiftPositionsUpAfter(tasksInSameList, taskToDelete.position)
+
+      // Batch updates the tasks on the server
+      const updatedTasks = await taskService.updateMultiple(repositionedTasks)
+
+      // Updated each task in the task store
+      updatedTasks.forEach(task => dispatch(updateTask(task)))
+
+      // Updates the last position count for the list the task was removed from
+      if (taskToDelete.done){
+        dispatch(addToLastDonePosition(-1))
+      } else {
+        dispatch(addToLastNotDonePosition(-1))
+      }
+    } catch (error) {
+      console.error(error)
+      console.log('FAILED DELETION')
     }
   }
 }
