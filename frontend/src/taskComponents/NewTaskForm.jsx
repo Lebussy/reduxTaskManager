@@ -10,7 +10,7 @@ const NewTaskForm = () => {
   }
 
   return (
-    <TaskForm handleSubmit={createNewTask}></TaskForm>
+    <TaskForm handleSubmit={createNewTask} placeholder='New task' ></TaskForm>
   )
 }
 

@@ -129,11 +129,15 @@ export const deleteTask = (taskToDelete) => {
 // Asynchronous action creator that takes a list of tasks, and the position change of a task
 // Uses the task helper to return an array of tasks that change after the position change
 export const changeTaskPosition = (tasks, fromPosition, toPosition) => {
-  const updatedTasks = taskHelper.updateTaskPositions(tasks, fromPosition, toPosition)
-  return async (dispatch) => {
-    const returnedTasks = await taskService.updateMultiple(updatedTasks)
-    // Once the server returns the tasks with the updated positions, each task is replaced by dispatching the replaceTask action
-    returnedTasks.forEach(task => dispatch(replaceTask(task)))
+  return async (dispatch) => { 
+    try {
+      const updatedTasks = taskHelper.updateTaskPositions(tasks, fromPosition, toPosition);
+      updatedTasks.forEach(task => dispatch(replaceTask(task)));
+      // Optimistically update the state before the server confirms the changes
+      await taskService.updateMultiple(updatedTasks);
+    } catch (error) {
+      console.error(error);
+    }
   }
 }
 

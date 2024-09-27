@@ -1,7 +1,6 @@
 import { useEffect } from "react"
 import { useDispatch} from "react-redux"
 import { initialiseTasksData} from "./reducers/taskReducer"
-import NewTaskForm from "./taskComponents/NewTaskForm"
 import DoneTasksDisplay from './taskComponents/DoneTasksDisplay'
 import NotDoneTasksDisplay from "./taskComponents/NotDoneTasksDisplay"
 import { clearIsEdit } from "./reducers/isEditReducer"
@@ -17,10 +16,9 @@ function App() {
 
   return (
     <div style={appStyle} onClick={() => dispatch(clearIsEdit())}>
-      <h2 >Tasks:</h2>
+      <p>(Double-click to edit, drag and drop to re-order)</p>
+      <h2>Tasks:</h2>
       <NotDoneTasksDisplay/>
-      <h3>Create task:</h3>
-      <NewTaskForm/>
       <h3>Done tasks:</h3>
       <DoneTasksDisplay/>
     </div>

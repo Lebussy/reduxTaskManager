@@ -1,11 +1,29 @@
+import { useDispatch } from "react-redux"
 import Task from "./Task"
-import {tasksDisplayStyle} from './TasksDisplayStyle'
+import { tasksDisplayStyle } from '../AppStyles'
 import { DragDropContext, Droppable } from "@hello-pangea/dnd"
+import { changeTaskPosition } from "../reducers/taskReducer"
 
-const TasksDisplay = ({ tasks }) => {
+const TasksDisplay = ({ tasks}) => {
+  const dispatch = useDispatch()
 
-  const onDragEnd = () => {
-    console.log('droppable dragged!')
+  // Handler for drag and drop event
+  // Takes a result parameter, an object with source and destination attributes, amoungst other things
+  const onDragEnd = ({source, destination}) => {
+
+    if (destination === null){
+      console.log('dropped into the ether, destination null')
+      return
+    } 
+
+    if (source.index === destination.index){
+      return
+    }
+
+    const fromPosition = source.index
+    const toPosition = destination.index
+    dispatch(changeTaskPosition(tasks, fromPosition, toPosition))
+
   }
 
   return (
@@ -15,13 +33,14 @@ const TasksDisplay = ({ tasks }) => {
     // somtimes used to pass props to the components through the parameter of the function
     <DragDropContext onDragEnd={onDragEnd}>
       <Droppable droppableId="taskDisplay">
+        
         {(provided) => (
-          <ul style={tasksDisplayStyle} {...provided.droppableProps}
+          <div style={tasksDisplayStyle} {...provided.droppableProps}
           ref={provided.innerRef}>
             {tasks.map(task => 
               <Task key={task.id} task={task}/>)}
             {provided.placeholder}
-          </ul>
+          </div>
         )}
       </Droppable>
     </DragDropContext>

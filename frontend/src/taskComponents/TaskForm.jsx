@@ -1,4 +1,4 @@
-const TaskForm = ({ handleSubmit, preFill = '' }) => {
+const TaskForm = ({ handleSubmit, preFill = '', placeholder = '' }) => {
   return (
     <form onSubmit={(event) => {
       event.preventDefault()
@@ -6,7 +6,7 @@ const TaskForm = ({ handleSubmit, preFill = '' }) => {
       handleSubmit(content)
       event.target.task.value = ''
     }}>
-      <input defaultValue={preFill} type="text" name="task"/>
+      <input placeholder={placeholder} defaultValue={preFill} type="text" name="task"/>
       <button type="submit">save</button>
     </form>
   )

@@ -1,7 +1,7 @@
 import EditTaskForm from "./EditTaskForm"
 import { useDispatch } from "react-redux"
 import { deleteTask, toggleDone } from "../reducers/taskReducer"
-import { buttonStyle } from "../styles/buttonStyle"
+import { buttonStyle } from "../AppStyles"
 import { useSelector } from "react-redux"
 import { setIsEdit } from "../reducers/isEditReducer"
 import '../styles/Task.css'

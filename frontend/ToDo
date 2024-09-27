@@ -1,8 +1,5 @@
+- make a bit prettier
 
+- describe possible actions
 
-Task positions:
-  - implement dnd
-    - look at pretty dnd documentation
-    - import the library and put list items into dnd
-
-- sort out display of done tasks with difference to not done - crossed out buttons?
+- connect to mongo instead
