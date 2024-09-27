@@ -5,6 +5,7 @@ import { buttonStyle } from "../styles/buttonStyle"
 import { useSelector } from "react-redux"
 import { setIsEdit } from "../reducers/isEditReducer"
 import '../styles/Task.css'
+import { Draggable } from "@hello-pangea/dnd"
 
 const Task = ({ task }) => {
   // There is a cost decision to be made here:
@@ -35,11 +36,15 @@ const Task = ({ task }) => {
   }
   
   return (
-    <li >
-      <div className="task-container">
-        {!isEdit ? renderDisplayDetails() : <EditTaskForm oldTask={task}/> }
-      </div>
-    </li>
+    <Draggable draggableId={task.id} index={task.position}>
+      {(provided) => (
+        <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+          <div className="task-container">
+            {!isEdit ? renderDisplayDetails() : <EditTaskForm oldTask={task}/> }
+          </div>
+        </div>
+      )}
+    </Draggable>
   )
 }
 
