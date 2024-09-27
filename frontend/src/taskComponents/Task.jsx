@@ -1,9 +1,10 @@
 import EditTaskForm from "./EditTaskForm"
 import { useDispatch } from "react-redux"
-import { deleteTask, updateTask } from "../reducers/taskReducer"
+import { deleteTask, toggleDone } from "../reducers/taskReducer"
 import { buttonStyle } from "../styles/buttonStyle"
 import { useSelector } from "react-redux"
 import { setIsEdit } from "../reducers/isEditReducer"
+import '../styles/Task.css'
 
 const Task = ({ task }) => {
   // There is a cost decision to be made here:
@@ -13,33 +14,32 @@ const Task = ({ task }) => {
 
   const dispatch = useDispatch()
 
-  const taskStyle = task.done
+  const taskContentStyle = task.done
     ? { textDecoration: 'line-through' }
     : {}
   
-  const renderEditButton = () => {
+  const renderDisplayDetails = () => {
     return (
-      <button style={buttonStyle} onClick={() => dispatch(setIsEdit(task.id))}>edit</button>
-    )
-  }
-
-  if (!isEdit) {
-    return (
-      <li style={taskStyle}>
-        {task.position + ') ' + task.content + ' '}
-        <button style={buttonStyle} onClick={() => dispatch(updateTask({...task, done: !task.done}))}>
+      <>
+        <p style={taskContentStyle} onDoubleClick={() => dispatch(setIsEdit(task.id))}>
+          {task.content + ' '}
+        </p>
+        <button style={buttonStyle} onClick={() => dispatch(toggleDone(task))}>
           {task.done? 'undo' : 'done'}
         </button>
-        {!task.done && renderEditButton()}
         <button style={buttonStyle} onClick={() => dispatch(deleteTask(task))}>
           delete
         </button>
-      </li>
+      </>
     )
-  } 
-
+  }
+  
   return (
-    <EditTaskForm oldTask={task}/>
+    <li >
+      <div className="task-container">
+        {!isEdit ? renderDisplayDetails() : <EditTaskForm oldTask={task}/> }
+      </div>
+    </li>
   )
 }
 

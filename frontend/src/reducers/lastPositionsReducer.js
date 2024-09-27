@@ -1,23 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const positionsSlice = createSlice({
-  name: 'positions',
-  initialState: {lastPositions: {
+  name: 'lastPositions',
+  initialState: {
     done: 0,
     notDone:0
-  }},
+  },
   reducers: {
     setLastDonePosition(state, action){
-      state.lastPositions.done = action.payload
+      state.done = action.payload
     },
     setLastNotDonePosition(state, action){
-      state.lastPositions.notDone = action.payload
+      state.notDone = action.payload
     },
     addToLastDonePosition(state, action){
-      state.lastPositions.done += action.payload
+      state.done += action.payload
     },
     addToLastNotDonePosition(state, action){
-      state.lastPositions.notDone += action.payload
+      state.notDone += action.payload
     }
     
   }

@@ -24,7 +24,6 @@ const deleteTask = async (taskId) => {
 
 const updateMultiple = async (updatedTasks) => {
   const response = await axios.put(`${baseUrl}/batch`, updatedTasks)
-  console.log(response.data)
   return response.data
 }
 

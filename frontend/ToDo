@@ -1,4 +1,8 @@
+
+
 Task positions:
- - implement changing of task positions when one task is deleted
- - implement changing the position of the task to the next lowest position in the list
-  - decide if want to make global state or 
+  - implement dnd
+    - look at pretty dnd documentation
+    - import the library and put list items into dnd
+
+- sort out display of done tasks with difference to not done - crossed out buttons?

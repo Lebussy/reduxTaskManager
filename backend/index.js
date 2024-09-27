@@ -16,34 +16,34 @@ app.use(reqLogger)
 
 let tasks = [
   {
-    content:'3 write the express server',
+    content:'write the express server',
     done: false,
     id:"1",
     position: 3
   },
   {
-    content:'2 connect to mongoDB',
+    content:'connect to mongoDB',
     done: false,
     id:"2",
     position: 2
   },
   {
-    content:'1 write the app frontend using redux <3',
-    done: false,
+    content:'write the app frontend using redux <3',
+    done: true,
     id:"3",
     position: 1
   },
   {
-    content:'4 get the positioning functions working',
+    content:'get the positioning functions working',
     done: false,
     id:"4",
     position: 4
   },
   {
-    content:'5 implement the react dnd',
+    content:'implement the dnd',
     done: false,
     id:"5",
-    position: 5
+    position: 1
   }
 ]
 
@@ -75,8 +75,6 @@ app.put('/api/tasks/batch', (req, res) => {
 
 app.put('/api/tasks/:id', (req, res) => {
   const id = req.params.id
-
-  console.log('foo')
 
   const updatedTask = req.body
 

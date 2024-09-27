@@ -4,6 +4,8 @@ import { initialiseTasksData} from "./reducers/taskReducer"
 import NewTaskForm from "./taskComponents/NewTaskForm"
 import DoneTasksDisplay from './taskComponents/DoneTasksDisplay'
 import NotDoneTasksDisplay from "./taskComponents/NotDoneTasksDisplay"
+import { clearIsEdit } from "./reducers/isEditReducer"
+import { appStyle } from "./AppStyles"
 
 
 function App() {
@@ -13,20 +15,8 @@ function App() {
     dispatch(initialiseTasksData())
   },[])
 
-  const appStyle = {
-    flexDirection: 'column',
-    justifyContent: 'center',
-    alignItems: 'center',
-    textAlign: 'center',
-    backgroundColor: '#74c4f4',
-    width: 'fit-content',
-    padding: '10px',
-    maxHeight: '90vh', // Set a maximum height
-    overflowY: 'auto' // Make it scrollable if content exceeds max height
-  };
-
   return (
-    <div style={appStyle}>
+    <div style={appStyle} onClick={() => dispatch(clearIsEdit())}>
       <h2 >Tasks:</h2>
       <NotDoneTasksDisplay/>
       <h3>Create task:</h3>

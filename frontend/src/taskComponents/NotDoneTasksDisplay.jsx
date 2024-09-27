@@ -7,9 +7,7 @@ const NotDoneTasksDisplay = () => {
     .toSorted((a,b) => a.position-b.position)
     
   return (
-    <div>
       <TasksDisplay tasks={notDoneTasks}/>
-    </div>
   )
 }
 
