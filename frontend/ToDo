@@ -1,5 +1,6 @@
-- make a bit prettier
+- Decide on color scheme
 
-- describe possible actions
+- Connect to mongo 
 
-- connect to mongo instead
+- Change the update of positions so that only the id of the task and the new position is sent- using a patch request
+  - same with editing the content, change to a patch request

@@ -1,6 +1,7 @@
 import express from 'express'
 import cors from 'cors'
 import reqLogger from './middlewear/requestLogger.js'
+import Task from './models/task.js'
 
 const app = express()
 
@@ -14,51 +15,19 @@ app.use(cors())
 
 app.use(reqLogger)
 
-let tasks = [
-  {
-    content:'write the express server',
-    done: false,
-    id:"1",
-    position: 3
-  },
-  {
-    content:'connect to mongoDB',
-    done: false,
-    id:"2",
-    position: 2
-  },
-  {
-    content:'write the app frontend using redux <3',
-    done: true,
-    id:"3",
-    position: 1
-  },
-  {
-    content:'get the positioning functions working',
-    done: false,
-    id:"4",
-    position: 4
-  },
-  {
-    content:'implement the dnd',
-    done: false,
-    id:"5",
-    position: 1
-  }
-]
 
 app.get('/api/tasks', (req, res) => {
-  res.json(tasks)
+  Task.find({}).then(tasks => res.json(tasks))
 })
 
-const generateId = () => {
-  return Math.ceil(Math.random() * 10000).toString()
-}
-
 app.post('/api/tasks', (req, res) => {
-  const newTask = {...req.body, id: generateId()}
-  tasks.push(newTask)
-  res.json(newTask)
+  const newTask = new Task({...req.body})
+
+  newTask.save()
+    .then(task => res.status(201).json(task))
+    .catch(error => {
+      console.log('Error adding task', error.message)
+      res.status(400).json ({error: error.message || 'could not add task'})})
 }) 
 
 app.put('/api/tasks/batch', (req, res) => {
@@ -92,6 +61,12 @@ app.delete('/api/tasks/:id', (req, res) => {
   
   res.status(204).end()
 })
+
+const unknownEndpoint = (req, res) => {
+  res.status(404).send({error: 'unknown endpiont'})
+}
+
+app.use(unknownEndpoint)
 
 
 app.listen(3001, () => {

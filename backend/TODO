@@ -1,0 +1,3 @@
+- 
+
+- Change the put request for changing positions and content to a patch request
