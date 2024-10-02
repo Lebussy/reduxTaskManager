@@ -13,7 +13,7 @@ const addTask = async (newTask) => {
 }
 
 const updateTask = async (updatedTask) => {
-  const response = await axios.put(`${baseUrl}/${updatedTask.id}`, updatedTask)
+  const response = await axios.patch(`${baseUrl}/${updatedTask.id}`, updatedTask)
   return response.data
 }
 
@@ -23,7 +23,7 @@ const deleteTask = async (taskId) => {
 }
 
 const updateMultiple = async (updatedTasks) => {
-  const response = await axios.put(`${baseUrl}/batch`, updatedTasks)
+  const response = await axios.patch(`${baseUrl}/batch`, updatedTasks)
   return response.data
 }
 

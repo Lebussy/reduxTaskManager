@@ -13,7 +13,7 @@ const EditTaskForm = ({ oldTask }) => {
   }
 
   return (
-    <TaskForm handleSubmit={handleTaskUpdate} preFill={oldTask.content} />
+    <TaskForm onClick={event => event.stopPropogation()} handleSubmit={handleTaskUpdate} preFill={oldTask.content} />
   )
 }
 

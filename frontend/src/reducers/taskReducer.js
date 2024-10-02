@@ -71,8 +71,13 @@ export const updateTasksAfterRemoving = (taskToRemove) => {
     // Returns an array containing the tasks with shifted positions after the task is removed
     const shiftedTasks = taskHelper.shiftPositionsUpAfter(tasksInListOfRemoving, taskToRemove.position)
 
+    // Transforms the array of tasks to an array of objects containing just the positions and ids
+    const shiftedPositions = shiftedTasks.map(task => {
+      return {id: task.id, position: task.position}
+    })
+
     // Batch updates these tasks to the server and waits for the response
-    const updatedTasks = await taskService.updateMultiple(shiftedTasks)
+    const updatedTasks = await taskService.updateMultiple(shiftedPositions)
 
     // Dispatches replace actions for the updated tasks to the store
     updatedTasks.forEach(task => dispatch(replaceTask(task)))
@@ -134,7 +139,10 @@ export const changeTaskPosition = (tasks, fromPosition, toPosition) => {
       const updatedTasks = taskHelper.updateTaskPositions(tasks, fromPosition, toPosition);
       updatedTasks.forEach(task => dispatch(replaceTask(task)));
       // Optimistically update the state before the server confirms the changes
-      await taskService.updateMultiple(updatedTasks);
+      const IDsAndPositions = updatedTasks.map(task => {
+        return {id: task.id, position: task.position}
+      })
+      await taskService.updateMultiple(IDsAndPositions);
     } catch (error) {
       console.error(error);
     }

@@ -1,3 +1,10 @@
-- 
+- create user routes
 
-- Change the put request for changing positions and content to a patch request
+-- make the user field of the task schema required after user is set up
+- write tests for adding user
+- create login route
+- write tests for logging in
+
+- create login functionality frontend
+- test frontend
+- deploy

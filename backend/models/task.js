@@ -1,22 +1,10 @@
 import mongoose from 'mongoose'
-import dotenv from 'dotenv'
-
-dotenv.config()
-
-mongoose.set('strictQuery', false)
-
-const uri = process.env.MONGODB_URI
-
-console.log('connnecting to ', uri)
-
-mongoose.connect(uri).then(result => {
-  console.log('connected to mongoDB')
-}).catch(error => console.log('error connecting to mongoDB', error.message))
 
 const taskSchema = new mongoose.Schema({
   content: {
     type: String,
-    required: true
+    required: true,
+    minlength: 3
   },
   done: {
     type: Boolean,
@@ -25,6 +13,10 @@ const taskSchema = new mongoose.Schema({
   position: {
     type: Number,
     required: true
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   }
 })
 
