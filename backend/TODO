@@ -1,9 +1,16 @@
-- create user routes
+- read the next section on user authentication DONE 
+- create login route DONE
 
--- make the user field of the task schema required after user is set up
-- write tests for adding user
-- create login route
+- Check how user is pulled from a request in the notes app
+- Create middlewear to pull user in tasks app
+- ensure users are logged-in when creating a task -
+- update the tests to inlcude a valid token 
+-- make tests work for creating user based on a temporary authentication token
 - write tests for logging in
+
+-- make it so that only logged in user can read/update their notes
+-- figure out how to make the positions work with only viewing logged-in users
+-- firgure out how to make server only respond with the tasks of the logged-in user
 
 - create login functionality frontend
 - test frontend

@@ -8,15 +8,9 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
-  firstname: {
+  name:{
     type: String,
-    minlength: 3,
-    maxlength: 16
-  },
-  lastname: {
-    type: String,
-    minlength: 3,
-    maxlength: 16
+    required: true
   },
   passwordHash:{
     type: String,
