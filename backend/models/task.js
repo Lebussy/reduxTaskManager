@@ -28,6 +28,12 @@ taskSchema.set('toJSON', {
     returnedObject.id = returnedObject._id.toString()
     delete returnedObject._id
     delete returnedObject.__v
+
+    // Checks if the user field is an Object id, incase it has not yet been populated
+    if (returnedObject.user && returnedObject.user instanceof mongoose.Types.ObjectId){
+      // Converts the ObjectId to a string
+      returnedObject.user = returnedObject.user.toString()
+    }
   }
 })
 

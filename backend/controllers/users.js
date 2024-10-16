@@ -32,7 +32,7 @@ usersRouter.post('/', async (req, res) => {
 // Known as projecting syntax
 
 usersRouter.get('/', async (req, res) => {
-  const users = await User.find({}).populate('tasks', {content: 1, done: 1})
+  const users = await User.find({}).populate('tasks', {content: 1})
   return res.status(200).json(users)
 })
 

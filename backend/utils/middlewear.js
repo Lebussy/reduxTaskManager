@@ -1,4 +1,6 @@
 import logger from './logger.js'
+import jwt from 'jsonwebtoken'
+import User from '../models/user.js'
 
 const errorHandler = (error, req, res, next) => {
   logger.error('ERROR NAME:', error.name)
@@ -38,4 +40,43 @@ const requestLogger = (req, res, next) => {
   next()
 }
 
-export default { errorHandler, unknownEndpoint, passwordValidator, requestLogger }
+// Method for extracting and returning the token from and express request
+const getTokenFrom = request => {
+  // Get method on an express request returns the header field value passed to it
+  const authorisation = request.get('Authorization')
+  // If the token is using the bearer scheme, the token is extracted and returned
+  if (authorisation && authorisation.startsWith('Bearer')){
+    return authorisation.replace('Bearer ', '')
+  }
+  return null
+}
+
+// Middlewear which appends the user to the request using the token in the authorization header
+// Returns status 401 if the token is invalid or user not found
+const userExtractor = async (req, res, next) => {
+  // Verifies and decodes the token from the authorization header
+  const token = getTokenFrom(req)
+  if (!token){
+    return res.status(400).json({error: "no authorisation token. Please use bearer scheme"})
+  }
+  
+  const decodedData = jwt.verify(token, process.env.SECRET)
+  
+  
+  // If the object returned by the verify method has an 'id' property the token is valid
+  if (!decodedData.id){
+    return res.status(401).json({error: "invalid token"})
+  }
+
+  // If the user id is not found the error message is sent
+  const user = await User.findById(decodedData.id)
+  if (!user){
+    return res.status(401).json({error: "user not found, please re-login"})
+  }
+
+  // If valid token and user found, user added to the req
+  req.user = user
+  next()
+}
+
+export default { errorHandler, unknownEndpoint, passwordValidator, requestLogger, userExtractor }

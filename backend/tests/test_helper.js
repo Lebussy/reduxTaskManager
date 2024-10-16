@@ -3,7 +3,8 @@ import User from '../models/user.js'
 import supertest from 'supertest'
 import app from '../app.js'
 import bcrypt from 'bcryptjs'
-import task from '../models/task.js'
+import jwt from 'jsonwebtoken'
+import user from '../models/user.js'
 
 export const api = supertest(app)
 
@@ -45,9 +46,9 @@ const initialUsers = [
     password: 'iLikeBurger55'
   },
   {
-    username: 'secodnUser',
-    name: 'linda',
-    password: 'iLike5inging'
+    username: 'secondUser',
+    name:'lina',
+    password: 'iLikeSinging22'
   }
 ]
 
@@ -56,15 +57,25 @@ const initialiseTasks = async () => {
   await Task.deleteMany({})
   // Adds a user id to the task objects
   const user = await User.findOne({})
-  const tasksWithUser = initialTasks.map(task => {
-    return {...task, user: user.id}
-  })
-  // Create and save initial tasks
-  await Task.insertMany(tasksWithUser)
+
+
+  // const tasksWithUser = initialTasks.map(task => {
+  //   return {...task, user: user.id}
+  // })
+  // // Create and save initial tasks
+  // await Task.insertMany(tasksWithUser)
+
+  // Synchronously saves the initial tasks, and adds their ids to the db
+  for (const task of initialTasks){
+    const newTask = new Task({...task, user: user._id})
+    await newTask.save()
+    user.tasks = user.tasks.concat(newTask._id)
+    await user.save()
+  }
 }
 
 // Initialises the database with some users
-const initialiseUsers = async () => {
+const initialiseUser = async () => {
   try {
     // Removes all the users from the db
     await User.deleteMany({})
@@ -85,12 +96,14 @@ const initialiseUsers = async () => {
   }
 }
 
+// Task data for adding to the database
 const validTaskData = {
   content: 'Test adding a valid task',
   done: false,
   position: 100
 }
 
+// Valid user data for adding to the database
 const validUserData = {
   username: 'validUsername',
   name: 'aValidName',
@@ -117,21 +130,25 @@ const usersInDb = async () => {
 // Returns a task object from the database
 const getExistingTaskObject = async () => {
   const taskDoc = await Task.findOne({})
-  return taskDoc.toJSON()
+  const asObject = taskDoc.toJSON()
+  return asObject
 }
 
 // Returns a user object from the database
 const getExistingUserObject = async () => {
   const userDoc = await User.findOne({})
-  return userDoc.toJSON()
+  const asObject = userDoc.toJSON()
+  return asObject
 }
 
+// Searches for a task by id and returns the task as JSON
 const getTaskObjectById = async (id) => {
   const taskDoc = await Task.findById(id)
   if (!taskDoc){
     return {}
   }
-  return taskDoc.toJSON()
+  const asObject = taskDoc.toJSON()
+  return asObject
 }
 
 // Provides a way of deterministically sorting mongo documents by their ids
@@ -139,13 +156,61 @@ const documentIdSorter = (a, b) => {
   return a.id.localeCompare(b.id)
 }
 
+// Gets a valid authorisation token
+const getValidBearerToken = async () => {
+  // Gets the initiailsed user from the database to authenticate
+  const {username} = initialUsers[0]
+  const userToAuthenticate = await User.findOne({username})
+
+  // Token payload
+  const tokenPayload = {
+    username,  
+    id: userToAuthenticate._id
+  }
+
+  // Returns the new signed token valid for 1 hour
+  const token = jwt.sign(tokenPayload, process.env.SECRET, {expiresIn: 60 * 60})
+  return `Bearer ${token}`
+}
+
+// Gets a valid authorization token for a user that has written no tasks
+const getValidNonAuthorBearerToken = async () => {
+  // Gets the second initialised user from the database to create token from
+  const {username} = initialUsers[1]
+  const nonAuthor = await User.findOne({username})
+
+  // token payload
+  const tokenPayload = {
+    username, 
+    id: nonAuthor._id
+  }
+
+  // Returns a valid token with the user information for the non-author
+  const token = jwt.sign(tokenPayload, process.env.SECRET, {expiresIn: 60 * 60})
+  return `Bearer ${token}`
+}
+
+const decodeToken = token => {
+  // Checks that the token exists
+  if (!token){
+    return null
+  }
+  // Checks if the token is valid, returns the decoded or null if invalid
+  try {
+    const decoded = jwt.verify(token, process.env.SECRET)
+    return decoded
+  } catch (error) {
+    console.error('decoding helper error, token invalid', error)
+    return null
+  }
+}
 
 
 export default { 
   initialTasks,
   initialUsers,
   initialiseTasks, 
-  initialiseUsers,
+  initialiseUser,
   validTaskData, 
   validUserData,
   tasksInDb, 
@@ -154,5 +219,7 @@ export default {
   getExistingUserObject,
   getTaskObjectById, 
   documentIdSorter,
-  
+  getValidBearerToken,
+  getValidNonAuthorBearerToken,
+  decodeToken,
 }

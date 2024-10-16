@@ -24,10 +24,16 @@ const userSchema = new mongoose.Schema({
 })
 
 const toJSONTransformFunction = (document, returnedObject) => {
-  returnedObject.id = returnedObject._id
+  returnedObject.id = returnedObject._id.toString()
   delete returnedObject._id
   delete returnedObject.__v
   delete returnedObject.passwordHash
+
+  // For the returned user object, checks if there are tasks in the tasks array, and that the type is an ObjectId
+  if (returnedObject.tasks && returnedObject.tasks.every(task => task instanceof mongoose.Types.ObjectId)){
+    // Converts the array of objectIds to an array of id strings
+    returnedObject.tasks = returnedObject.tasks.map(taskObjectId => taskObjectId.toString())
+  }
 }
 
 userSchema.set('toJSON', {

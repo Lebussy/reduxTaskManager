@@ -4,15 +4,68 @@ import assert from 'node:assert'
 import mongoose from 'mongoose'
 import helper from './test_helper.js'
 import { api } from './test_helper.js'
+import task from '../models/task.js'
 
-describe('When there are initially some users in the database', () => {
-  // Initialises the database with two users
+describe('When there is initially one user in the database', () => {
+  // Initialises the database with a user
   beforeEach(async () => {
     try {
-      await helper.initialiseUsers()
+      await helper.initialiseUser()
     } catch (error) {
       console.error('Error initializing users:', error)
     }
+  })
+
+  // Tests the login router
+  describe('logging in...', () => {
+    test('returns a valid token with correct credentials', async () => {
+      // Sends login request
+      const initialUser = helper.initialUsers[0]
+      const response = await api.post('/api/login')
+        .send({
+          username: initialUser.username,
+          password: initialUser.password
+        })
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      // Asserts that a token is included in the response
+      assert(response.body.token)
+
+      // Asserts that the token is valid and contains the username of the user
+      assert.strictEqual(helper.decodeToken(response.body.token).username, initialUser.username)
+    })
+
+    test('returns correct status and error message for incorrect password', async () => {
+      // Sends a login request with incorrect password
+      const initialUser = helper.initialUsers[0]
+      const response = await api.post('/api/login')
+        .send({
+          username:initialUser.username,
+          password:'incorrect'
+        })
+        // Asserts correct status code
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+      
+      // Asserts that the response contains appropriate error message
+      assert(response.body.error.includes('incorrect'))
+    })
+
+    test('returns correct status and error message for invalid username', async () => {
+      // Sends a login request with incorrect password
+      const response = await api.post('/api/login')
+        .send({
+          username:'invalidUsername',
+          password:'incorrect'
+        })
+        // Asserts correct status code
+        .expect(401)
+        .expect('Content-Type', /application\/json/)
+      
+      // Asserts that the response contains appropriate error message
+      assert(response.body.error.includes('incorrect'))
+    })
   })
 
   describe('creating a new user...', () => {
@@ -84,17 +137,20 @@ describe('When there are initially some users in the database', () => {
     test('tasks are returned as json', async () => {
       await api
         .get('/api/tasks')
+        .set('Authorization', await helper.getValidBearerToken())
         .expect(200) // Assert that the status code is 200
         .expect('Content-Type', /application\/json/) // Assert that the Content-Type is JSON
     })
   
     test('correct number of tasks returned', async () => {
       const response = await api.get('/api/tasks')
+        .set('Authorization', await helper.getValidBearerToken())
       assert.strictEqual(response.body.length, helper.initialTasks.length)
     })
   
     test('All the contents of the tasks are returned correctly', async () => {
       const response = await api.get('/api/tasks')
+        .set('Authorization', await helper.getValidBearerToken())
       // Maps the contents of the returned tasks into an array
       const returnedContents = response.body.map(task => task.content)
       // Asserts that each of the initial task contents are in the returned contents array
@@ -106,34 +162,74 @@ describe('When there are initially some users in the database', () => {
   
     describe('Deleting a task...', () => {
       
-      test('succeeds with a correct id', async () => {
+      test('succeeds with a correct id and user', async () => {
+        // Gets the list of task ids associated with the user at the start
+        const userAuthor = await helper.getExistingUserObject()
+        const usersTasksAtStart = userAuthor.tasks
+
+        // Gets an existing tasks and requests to delete it
         const validTaskObject = await helper.getExistingTaskObject()
         const validID = validTaskObject.id
         await api.delete(`/api/tasks/${validID}`)
+          .set('Authorization', await helper.getValidBearerToken())
           .expect(204)
   
+        // Tasks in the database after the request as returned a response
         const tasksAtEnd = await helper.tasksInDb()
   
         // Asserts that the number tasks in the db has been reduced by 1
-        assert.strictEqual(helper.initialTasks.length, tasksAtEnd.length + 1)
+        assert.strictEqual(helper.initialTasks.length - 1 , tasksAtEnd.length)
   
         // Asserts that the content of the deleted task is not in the db
         const contentsAtEnd = tasksAtEnd.map(task => task.content)
         assert(!contentsAtEnd.includes(validTaskObject.content))
+
+        // Asserts that deleting the task removes it from the tasks list on the user document
+        const userObjectAfterDelete = await helper.getExistingUserObject()
+        const usersTasksAtEnd = userObjectAfterDelete.tasks
+        assert(usersTasksAtEnd.length === usersTasksAtStart.length - 1)
       })
   
       test('returns correct status and error message with malformed id', async () => {
         const response = await api.delete('/api/tasks/123')
+          .set('Authorization', await helper.getValidBearerToken())
           .expect(400)
       
         assert(response.body.error.toLowerCase().includes('malformatted id'))
       })
-    })
+
+      test('fails and returns the correct status and error message if user is not the author', async () => {
+        // Tasks at the start of the database
+        const tasksAtStart = await helper.tasksInDb()
+
+        // Gets a task object from the database
+        const taskObject = await helper.getExistingTaskObject()
+
+        // Gets a non-author token
+        const nonAuthorToken = await helper.getValidNonAuthorBearerToken()
+
+        // Response from the server
+        const response = await api.delete(`/api/tasks/${taskObject.id}`)
+          .set('Authorization', nonAuthorToken)
+          .expect(401)
+          .expect('Content-Type', /application\/json/)
+
+        // Asserts that that the correct error message is sent
+        console.log('############error message from server#####################')
+        console.log(response.body.error)
+        assert(response.body.error.toLowerCase().includes('author '))
+
+        // Asserts that the same number of tasks are in the database
+        const tasksAtEnd = await helper.tasksInDb()
+        assert.strictEqual(tasksAtStart.length, tasksAtEnd.length)
+      })
+
+    })  
   
     describe('Adding a new task...', () => {
-  
       test('succeeds with valid task data', async () => {
         await api.post('/api/tasks')
+          .set('Authorization', await helper.getValidBearerToken())
           .send(helper.validTaskData)
           .expect(201)
           .expect('Content-Type', /application\/json/)
@@ -149,6 +245,7 @@ describe('When there are initially some users in the database', () => {
       test('fails with correct error code and message if content missing', async () => {
         // Posts a task with a missing content
         const response = await api.post('/api/tasks')
+          .set('Authorization', await helper.getValidBearerToken())
           .send({done: false,
             position: 1000
           })
@@ -161,6 +258,7 @@ describe('When there are initially some users in the database', () => {
       test('fails with correct error code and message if position missing', async () => {
         // Posts a task with a missing position
         const response = await api.post('/api/tasks')
+          .set('Authorization', await helper.getValidBearerToken())
           .send({content: 'task with position missing',
             done: false
           })
@@ -172,6 +270,7 @@ describe('When there are initially some users in the database', () => {
   
       test('fails with correct error code and message if content is too short', async () => {
         const response = await api.post('/api/tasks')
+          .set('Authorization', await helper.getValidBearerToken())
           .send({content: 'fo', done: false, position: 1000})
           .expect(400)
         
@@ -183,11 +282,11 @@ describe('When there are initially some users in the database', () => {
         // Helper function to send a patch request and assert the response
         const patchTaskAndAssert = async (taskId, updateData, expectedTask) => {
           const response = await api.patch(`/api/tasks/${taskId}`)
+            .set('Authorization', await helper.getValidBearerToken())
             .send(updateData)
             .expect(200)
   
           assert.deepStrictEqual(response.body, expectedTask)
-  
           const taskAtEnd = await helper.getTaskObjectById(taskId)
           assert.deepStrictEqual(taskAtEnd, expectedTask)
         }
@@ -212,8 +311,10 @@ describe('When there are initially some users in the database', () => {
   
         test('just the position of the task succeeds', async () => {
           // Gets a task to updated from the database
-          const oldTaskObject = await helper.getExistingTaskObject()
+          const oldTaskObject = await helper.getExistingTaskObject()#
+          // The update to send
           const update = {position: 9090}
+          // How the task should be after the update
           const expectedTask = {...oldTaskObject, ...update}
   
           await patchTaskAndAssert(oldTaskObject.id, update, expectedTask)
@@ -226,26 +327,31 @@ describe('When there are initially some users in the database', () => {
           const updates = [
             {
               id: tasksToUpdate[0].id,
-              content: 'content updated in a batch'
+              content: 'content updated in a batch',
+              user: tasksToUpdate[0].user
             },
             {
               id: tasksToUpdate[1].id,
-              done: !tasksToUpdate[1].done
+              done: !tasksToUpdate[1].done,
+              user: tasksToUpdate[1].user
             },
             {
               id: tasksToUpdate[2].id,
-              position: 3000
+              position: 3000,
+              user: tasksToUpdate[2].user
             },
             {
               id: tasksToUpdate[3].id,
               content: 'content, done and position updated',
               done: !tasksToUpdate[3].done,
-              position: 4000
+              position: 4000,
+              user: tasksToUpdate[3].user
             }
           ]
   
           // Sends the updates to the /api/tasks/batch patch route
           const response = await api.patch('/api/tasks/batch')
+            .set('Authorization', await helper.getValidBearerToken())
             .send(updates)
             .expect(200)
   
@@ -255,6 +361,7 @@ describe('When there are initially some users in the database', () => {
             return {...task, ...updates[index]}
           }).sort(helper.documentIdSorter)
   
+          // Asserts that the tasks in the database are as expected
           const returnedTasks = response.body.sort(helper.documentIdSorter)
           assert.deepStrictEqual(expectedTasks, returnedTasks)
         })
