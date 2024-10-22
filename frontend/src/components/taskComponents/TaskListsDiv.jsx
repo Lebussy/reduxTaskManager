@@ -14,9 +14,9 @@ const TaskListsDiv = () => {
   return (
     <div>
       <p>(Double-click to edit, drag and drop to re-order)</p>
-      <h2>Tasks:</h2>
+      <h3>TODO:</h3>
       <NotDoneTasksDisplay/>
-      <h3>Done tasks:</h3>
+      <h3>Done:</h3>
       <DoneTasksDisplay/>
     </div>
   )

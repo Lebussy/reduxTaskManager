@@ -16,17 +16,20 @@ const NotificationDisplay = () => {
     'ERROR': {
       color: 'red',
       backgroundColor: '#FF999C',
-      padding: '1px'
+      padding: '1px',
+      margin: '4px'
     },
     'SUCCESS': {
       color: 'green',
       backgroundColor: '#9cff99',
-      padding: '1px'
+      padding: '1px',
+      margin: '4px'
     },
     'DEFAULT': {
       color: 'blue',
       backgroundColor: '#999cff',
       padding: '1px',
+      margin: '4px'
     }
   }
 

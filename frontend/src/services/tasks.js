@@ -2,6 +2,11 @@ import axios from 'axios'
 
 const baseUrl = 'http://localhost:3001/api/tasks'
 
+// Sets the global authorisation token for requests in this module
+const setAuthToken = (token) => {
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+}
+
 const getTasks = async () => {
   const tasks = await axios.get(baseUrl)
   return tasks.data
@@ -27,4 +32,4 @@ const updateMultiple = async (updatedTasks) => {
   return response.data
 }
 
-export default { getTasks, addTask, updateTask, deleteTask, updateMultiple }
+export default { getTasks, addTask, updateTask, deleteTask, updateMultiple, setAuthToken }
