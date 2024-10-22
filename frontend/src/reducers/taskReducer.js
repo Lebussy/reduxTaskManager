@@ -45,12 +45,17 @@ export const createTask = (content) => {
 // - the last positions in the done and notDone lists
 export const initialiseTasksData = () => {
   return async (dispatch) => {
-    const taskData = await taskService.getTasks()
-    dispatch(setTaskData(taskData))
-    const doneTasks = taskData.filter(task => task.done)
-    const notDoneTasks = taskData.filter(task => !task.done)
-    dispatch(setLastDonePosition(doneTasks.length))
-    dispatch(setLastNotDonePosition(notDoneTasks.length))
+    try {
+      const taskData = await taskService.getTasks()
+      dispatch(setTaskData(taskData))
+      const doneTasks = taskData.filter(task => task.done)
+      const notDoneTasks = taskData.filter(task => !task.done)
+      dispatch(setLastDonePosition(doneTasks.length))
+      dispatch(setLastNotDonePosition(notDoneTasks.length))
+    } catch (error) {
+      console.log('#################################')
+      console.log(error.response.data.error)
+    }
   }
 }
 

@@ -1,0 +1,42 @@
+- read the next section on user authentication DONE 
+- create login route DONE
+
+- Check how user is pulled from a request in the notes app DONE
+- Create middlewear to pull user in tasks app DONE
+- ensure users are logged-in when creating a task DONE
+- update the tests to inlcude a valid token DONE
+-- make tests work for creating user based on a temporary authentication token DONE
+- write tests for logging in DONE
+-- Change the test helper iniitialisation so that the users tasks field is updated DONE
+-- add the testing for delete to ensure that the task is removed from the users task list DONE
+
+-- make it so that only logged in user can update/delete their notes backend DONE
+-- make tests to express this restriction DONE
+ -- TODO ERROR : updating batch not consistently passed, maybe iniitialisation with random user or different user for 
+ authorisation used? DONE
+
+ -- get requests only return the tasks of the user DONE
+
+ -- express this restriction in the tests DONE
+      - currently: writing method to return valid token for second user DONE
+      - write the tests for the validation of the restriction DONE
+
+-- figure out how to make the positions work with only viewing logged-in users DONE
+-- firgure out how to make server only respond with the tasks of the logged-in user DONE (authorization token extracts user and uses users id to query for tasks from the db)
+
+-- handle axios error when fetching tasks
+-- create a notification box to show error messages and successes
+
+- create login functionality frontend
+-- read the next section from the FSO course
+-- create login form component
+-- create user form component
+-- have the user token sent with the requests to get/post/update ect.
+
+
+- test frontend
+- deploy
+
+
+SOMEDAY/MAYBE:
+  - seperate done/notdone tasks in state so that only relevant tasks are re-rendered on list change
