@@ -4,40 +4,59 @@ import supertest from 'supertest'
 import app from '../app.js'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import user from '../models/user.js'
 
 export const api = supertest(app)
 
 // Keeping db interactions in the helper module means:
 // re-usable and easily refactored code, for example if changing databases
 
-const initialTasks = [
-  {
-    content: 'Write tests for tasks backend',
-    done: false,
-    position: 1
-  },
-  {
-    content: 'Implement user routes',
-    done: false,
-    position: 2
-  },
-  {
-    content: 'Test the user routes',
-    done: false,
-    position: 3
-  },
-  {
-    content: 'Make a MVP for the frontend',
-    done: true,
-    position: 1
-  },
-  {
-    content: 'Route the MVP for backend of tasks',
-    done: true,
-    position: 2
-  }
-]
+const initialTasks = {
+  firstUser: [
+    {
+      content: 'Write tests for tasks backend',
+      done: false,
+      position: 1
+    },
+    {
+      content: 'Implement user routes',
+      done: false,
+      position: 2
+    },
+    {
+      content: 'Test the user routes',
+      done: false,
+      position: 3
+    },
+    {
+      content: 'Make a MVP for the frontend',
+      done: true,
+      position: 1
+    },
+    {
+      content: 'Route the MVP for backend of tasks',
+      done: true,
+      position: 2
+    }
+  ],
+  secondUser: [
+    {
+      content: 'Go to the gym today',
+      done: false,
+      position: 1
+    },
+    {
+      content: 'Eat 100g protein',
+      done: false,
+      position: 2
+    },
+    {
+      content: 'eat 5 fruit/veg',
+      done: true,
+      position: 1
+    }
+  ]
+}
+
 
 const initialUsers = [
   {
@@ -53,29 +72,39 @@ const initialUsers = [
 ]
 
 const initialiseTasks = async () => {
-  // Delete all tasks
+  // Delete all existing tasks
   await Task.deleteMany({})
-  // Adds a user id to the task objects
-  const user = await User.findOne({})
 
-
-  // const tasksWithUser = initialTasks.map(task => {
-  //   return {...task, user: user.id}
-  // })
-  // // Create and save initial tasks
-  // await Task.insertMany(tasksWithUser)
+  // Gets a user object to be the author of the tasks
+  const {username} = initialUsers[0]
+  const firstUser = await User.findOne({username})
 
   // Synchronously saves the initial tasks, and adds their ids to the db
-  for (const task of initialTasks){
-    const newTask = new Task({...task, user: user._id})
+  for (const task of initialTasks.firstUser){
+    const newTask = new Task({...task, user: firstUser._id})
     await newTask.save()
-    user.tasks = user.tasks.concat(newTask._id)
-    await user.save()
+    firstUser.tasks = firstUser.tasks.concat(newTask._id)
+    await firstUser.save()
+  }
+}
+
+const initialiseSecondUsersTasks = async () => {
+  // Gets a second user to initialise second set of tasks
+  const secondUsername = initialUsers[1].username
+  const secondUser = await User.findOne({username: secondUsername})
+
+  // Synchronously saves each of the initial tasks for the second user
+  // Adds the id of the task to the array of tasks on the user document
+  for (const task of initialTasks.secondUser){
+    const newTask = new Task({...task, user: secondUser._id})
+    await newTask.save()
+    secondUser.tasks = secondUser.tasks.concat(newTask._id)
+    await secondUser.save()
   }
 }
 
 // Initialises the database with some users
-const initialiseUser = async () => {
+const initialiseUsers = async () => {
   try {
     // Removes all the users from the db
     await User.deleteMany({})
@@ -136,7 +165,8 @@ const getExistingTaskObject = async () => {
 
 // Returns a user object from the database
 const getExistingUserObject = async () => {
-  const userDoc = await User.findOne({})
+  const {username} = initialUsers[0]
+  const userDoc = await User.findOne({username})
   const asObject = userDoc.toJSON()
   return asObject
 }
@@ -156,21 +186,37 @@ const documentIdSorter = (a, b) => {
   return a.id.localeCompare(b.id)
 }
 
+// Returns a valid bearer token for the user passed to it
+const signForUser = user => {
+  // Payload for the token
+  const payload = {
+    username: user.username,
+    id: user._id
+  }
+
+  // Token 
+  const token = jwt.sign(payload, process.env.SECRET, {expiresIn: 60*60})
+
+  // Returns the token in the bearer scheme
+  return `Bearer ${token}`
+}
+
 // Gets a valid authorisation token
 const getValidBearerToken = async () => {
   // Gets the initiailsed user from the database to authenticate
   const {username} = initialUsers[0]
   const userToAuthenticate = await User.findOne({username})
 
-  // Token payload
-  const tokenPayload = {
-    username,  
-    id: userToAuthenticate._id
-  }
+  return signForUser(userToAuthenticate)
+}
 
-  // Returns the new signed token valid for 1 hour
-  const token = jwt.sign(tokenPayload, process.env.SECRET, {expiresIn: 60 * 60})
-  return `Bearer ${token}`
+// Gets a valid authorisation token for the secondUser, using the bearer scheme
+const getSecondUserBearerToken = async () => {
+  // Gets the second user from the database
+  const {username} = initialUsers[1]
+  const secondUser = await User.findOne({username})
+
+  return signForUser(secondUser)
 }
 
 // Gets a valid authorization token for a user that has written no tasks
@@ -205,12 +251,20 @@ const decodeToken = token => {
   }
 }
 
+// Returns an invalid jwt
+const getInvalidToken = () => {
+  const token = jwt.sign(initialUsers[0], 'wrong secret', {expiresIn: 60*60})
+  return `Bearer ${token}`
+}
+
+
 
 export default { 
   initialTasks,
   initialUsers,
   initialiseTasks, 
-  initialiseUser,
+  initialiseSecondUsersTasks,
+  initialiseUsers,
   validTaskData, 
   validUserData,
   tasksInDb, 
@@ -220,6 +274,9 @@ export default {
   getTaskObjectById, 
   documentIdSorter,
   getValidBearerToken,
+  getSecondUserBearerToken,
   getValidNonAuthorBearerToken,
   decodeToken,
+  getInvalidToken
+  
 }

@@ -1,7 +1,6 @@
 import express from 'express'
 const tasksRouter = express.Router()
 import 'express-async-errors'
-import User from '../models/user.js'
 import Task from '../models/task.js'
 import middlewear from '../utils/middlewear.js'
 
@@ -9,8 +8,11 @@ tasksRouter.use(middlewear.userExtractor)
 
 // Route for retrieving all tasks,
 // Uses populate method to include the name and username of task author
+// Only tasks of the user are returned
 tasksRouter.get('/', async (req, res) => {
-  const tasks = await Task.find({})
+  // User making the request
+  const user = req.user
+  const tasks = await Task.find({user: user.id})
   res.status(200).json(tasks)
 })
 
@@ -132,7 +134,7 @@ tasksRouter.delete('/:id', async (req, res) => {
 
   // If the user is not the author of the task, error message and status returned
   if (requestUser._id.toString() !== taskToDelete.user.toString()){
-    return res.status(401).json({error: 'not authorised to delete task you didnt write'})
+    return res.status(401).json({error: 'not authorised to delete that task'})
   }
 
   // Deletes the resource because the author of the task is the requests user

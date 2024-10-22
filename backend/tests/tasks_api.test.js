@@ -4,13 +4,12 @@ import assert from 'node:assert'
 import mongoose from 'mongoose'
 import helper from './test_helper.js'
 import { api } from './test_helper.js'
-import task from '../models/task.js'
 
-describe('When there is initially one user in the database', () => {
+describe('When there is initially two users in the database', () => {
   // Initialises the database with a user
   beforeEach(async () => {
     try {
-      await helper.initialiseUser()
+      await helper.initialiseUsers()
     } catch (error) {
       console.error('Error initializing users:', error)
     }
@@ -125,7 +124,7 @@ describe('When there is initially one user in the database', () => {
     })
   })
 
-  describe('When there are some tasks in the database', async () => {
+  describe('When there are some tasks in the database authored by one user', async () => {
     beforeEach(async () => {
       try {
         await helper.initialiseTasks()
@@ -145,7 +144,7 @@ describe('When there is initially one user in the database', () => {
     test('correct number of tasks returned', async () => {
       const response = await api.get('/api/tasks')
         .set('Authorization', await helper.getValidBearerToken())
-      assert.strictEqual(response.body.length, helper.initialTasks.length)
+      assert.strictEqual(response.body.length, helper.initialTasks.firstUser.length)
     })
   
     test('All the contents of the tasks are returned correctly', async () => {
@@ -154,9 +153,36 @@ describe('When there is initially one user in the database', () => {
       // Maps the contents of the returned tasks into an array
       const returnedContents = response.body.map(task => task.content)
       // Asserts that each of the initial task contents are in the returned contents array
-      const initialTasksContents = helper.initialTasks.map(task => task.content)
+      const initialTasksContents = helper.initialTasks.firstUser.map(task => task.content)
       initialTasksContents.forEach(content => {
         assert(returnedContents.includes(content))
+      })
+    })
+
+    describe('and some tasks authored by a second user', () => {
+      // Before each test, initialise the second users tasks to the database
+      beforeEach(async () => {
+        try {
+          await helper.initialiseSecondUsersTasks()
+        } catch (error) {
+          console.error('Error initializing tasks:', error)
+        }
+      })
+
+      test('only the second users tasks are returned for the second users authorisation token', async () => {
+        // Get request for the tasks using the authorisation token of the second user
+        const response = await api.get('/api/tasks')
+          .set('Authorization', await helper.getSecondUserBearerToken())
+          .expect(200)
+          .expect('Content-Type', /application\/json/)
+
+        // Asserts that the number of tasks returned is equal to the number of initial tasks for the second user
+        assert.strictEqual(response.body.length, helper.initialTasks.secondUser.length)
+
+        // Asserts that the correct tasks contents are returned with the request
+        const returnedContents = response.body.map(task => task.content).toSorted()
+        const initialTasksContents = helper.initialTasks.secondUser.map(task => task.content).toSorted()
+        assert.deepStrictEqual(returnedContents, initialTasksContents)
       })
     })
   
@@ -178,7 +204,7 @@ describe('When there is initially one user in the database', () => {
         const tasksAtEnd = await helper.tasksInDb()
   
         // Asserts that the number tasks in the db has been reduced by 1
-        assert.strictEqual(helper.initialTasks.length - 1 , tasksAtEnd.length)
+        assert.strictEqual(helper.initialTasks.firstUser.length - 1 , tasksAtEnd.length)
   
         // Asserts that the content of the deleted task is not in the db
         const contentsAtEnd = tasksAtEnd.map(task => task.content)
@@ -215,9 +241,7 @@ describe('When there is initially one user in the database', () => {
           .expect('Content-Type', /application\/json/)
 
         // Asserts that that the correct error message is sent
-        console.log('############error message from server#####################')
-        console.log(response.body.error)
-        assert(response.body.error.toLowerCase().includes('author '))
+        assert(response.body.error.toLowerCase().includes('not authorised to delete that task'))
 
         // Asserts that the same number of tasks are in the database
         const tasksAtEnd = await helper.tasksInDb()
@@ -227,7 +251,8 @@ describe('When there is initially one user in the database', () => {
     })  
   
     describe('Adding a new task...', () => {
-      test('succeeds with valid task data', async () => {
+      test('succeeds with valid task data and user info', async () => {
+        const userObjectAtStart = await helper.getExistingUserObject()
         await api.post('/api/tasks')
           .set('Authorization', await helper.getValidBearerToken())
           .send(helper.validTaskData)
@@ -236,10 +261,14 @@ describe('When there is initially one user in the database', () => {
         
         // Asserts that there is an increase in the number of tasks
         const tasksAtEnd = await helper.tasksInDb()
-        assert.strictEqual(tasksAtEnd.length - 1, helper.initialTasks.length)
+        assert.strictEqual(tasksAtEnd.length - 1, helper.initialTasks.firstUser.length)
   
         // Asserts that the content of the new task is in the db
         assert(tasksAtEnd.map(task => task.content).includes(helper.validTaskData.content))
+
+        // Asserts that the array of tasks on the user document increases in length
+        const userObjectAtEnd = await helper.getExistingUserObject()
+        assert.strictEqual(userObjectAtStart.tasks.length, userObjectAtEnd.tasks.length - 1)
       })
   
       test('fails with correct error code and message if content missing', async () => {
@@ -276,6 +305,15 @@ describe('When there is initially one user in the database', () => {
         
         assert(response.body.error.includes('content'))
       })
+
+      test('fails with not authorized if invalid token', async () => {
+        const response = await api.post('/api/tasks')
+          .set('Authorization', helper.getInvalidToken())
+          .send(helper.validTaskData)
+          .expect(401)
+
+        assert(response.body.error.includes('invalid signature'))
+      })
     })
   
     describe('updating...', () => {
@@ -311,7 +349,7 @@ describe('When there is initially one user in the database', () => {
   
         test('just the position of the task succeeds', async () => {
           // Gets a task to updated from the database
-          const oldTaskObject = await helper.getExistingTaskObject()#
+          const oldTaskObject = await helper.getExistingTaskObject()
           // The update to send
           const update = {position: 9090}
           // How the task should be after the update
@@ -321,9 +359,11 @@ describe('When there is initially one user in the database', () => {
         })
   
         test('a batch of changes succeeds', async () =>{
-          // An array of objects with an id, and the content to update
+          // Gets the task objects that were initialised to the database
           const tasksInDb = await helper.tasksInDb()
           const tasksToUpdate = tasksInDb.slice(0, 4)
+      
+          // Creates updates for the tasks using their id and existing fields
           const updates = [
             {
               id: tasksToUpdate[0].id,
@@ -350,6 +390,7 @@ describe('When there is initially one user in the database', () => {
           ]
   
           // Sends the updates to the /api/tasks/batch patch route
+          // The bearer token validates that the author of the tasks is making the batch update
           const response = await api.patch('/api/tasks/batch')
             .set('Authorization', await helper.getValidBearerToken())
             .send(updates)

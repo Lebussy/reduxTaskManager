@@ -54,20 +54,30 @@ const getTokenFrom = request => {
 // Middlewear which appends the user to the request using the token in the authorization header
 // Returns status 401 if the token is invalid or user not found
 const userExtractor = async (req, res, next) => {
-  // Verifies and decodes the token from the authorization header
+
   const token = getTokenFrom(req)
+
+  // If no token inlcuded, return bad request status and error
   if (!token){
     return res.status(400).json({error: "no authorisation token. Please use bearer scheme"})
   }
-  
-  const decodedData = jwt.verify(token, process.env.SECRET)
-  
+
+  // Attempts to decode the token
+  // Returns unauthorised status and error messgae if the token is invalid
+  // If invalid, jwt.verify throws an error that needs handling if token is invalid
+
+  let decodedData
+  try {
+    decodedData = jwt.verify(token, process.env.SECRET)
+  } catch (e) {
+    return res.status(401).json({error: e.message})
+  }
   
   // If the object returned by the verify method has an 'id' property the token is valid
   if (!decodedData.id){
     return res.status(401).json({error: "invalid token"})
   }
-
+  
   // If the user id is not found the error message is sent
   const user = await User.findById(decodedData.id)
   if (!user){
