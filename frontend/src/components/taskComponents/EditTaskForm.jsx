@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
-import { updateTask } from "../reducers/taskReducer";
+import { updateTask } from "../../reducers/taskReducer";
 import TaskForm from "./TaskForm";
-import { clearIsEdit } from "../reducers/isEditReducer";
+import { clearIsEdit } from "../../reducers/isEditReducer";
 
 const EditTaskForm = ({ oldTask }) => {
   const dispatch = useDispatch()

@@ -3,7 +3,8 @@ import { useDispatch} from "react-redux"
 import { initialiseTasksData} from "./reducers/taskReducer"
 import { clearIsEdit } from "./reducers/isEditReducer"
 import { appStyle } from "./AppStyles"
-import TaskListsDiv from "./taskComponents/TaskListsDiv"
+import TaskListsDiv from "./components/taskComponents/TaskListsDiv"
+import NotificationDisplay from './components/notificationComponents/NotificationDisplay'
 
 
 const App = () => {
@@ -15,6 +16,7 @@ const App = () => {
 
   return (
     <div style={appStyle} onClick={() => dispatch(clearIsEdit())}>
+      <NotificationDisplay/>
       <TaskListsDiv/>
     </div>
   )

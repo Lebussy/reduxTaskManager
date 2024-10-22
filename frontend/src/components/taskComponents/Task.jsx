@@ -1,10 +1,10 @@
 import EditTaskForm from "./EditTaskForm"
 import { useDispatch } from "react-redux"
-import { deleteTask, toggleDone } from "../reducers/taskReducer"
-import { buttonStyle } from "../AppStyles"
+import { deleteTask, toggleDone } from "../../reducers/taskReducer"
+import { buttonStyle } from "../../AppStyles"
 import { useSelector } from "react-redux"
-import { setIsEdit } from "../reducers/isEditReducer"
-import '../styles/Task.css'
+import { setIsEdit } from "../../reducers/isEditReducer"
+import '../../styles/Task.css'
 import { Draggable } from "@hello-pangea/dnd"
 
 const Task = ({ task }) => {

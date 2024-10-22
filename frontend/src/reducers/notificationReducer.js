@@ -25,3 +25,23 @@ export const { setNotification, clearNotification } = notificationSlice.actions
 
 // Exports the default reducer for the slice
 export default notificationSlice.reducer
+
+// Asynchronous action creator for setting the notification message
+// Thunks return an async function that returns an action.
+// The function that is returned takes the dispatch function as a parameter
+export const notify = (message, type, notificationDuration) => {
+  return async (dispatch) => {
+    // Notification object to set the notification state slice to
+    const notificationPayload = {
+      message,
+      type
+    }
+    // Sets the notification message and type
+    dispatch(setNotification(notificationPayload))
+
+    // Clears the message after a set amount of time
+    setTimeout(() => {
+      dispatch(clearNotification())
+    }, notificationDuration * 1000)
+  }
+}

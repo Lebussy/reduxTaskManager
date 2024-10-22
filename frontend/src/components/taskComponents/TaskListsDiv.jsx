@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 import { useDispatch} from "react-redux"
-import { initialiseTasksData} from "../reducers/taskReducer"
+import { initialiseTasksData} from "../../reducers/taskReducer"
 import DoneTasksDisplay from './DoneTasksDisplay'
 import NotDoneTasksDisplay from "./NotDoneTasksDisplay"
 

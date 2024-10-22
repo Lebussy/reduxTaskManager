@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import TasksDisplay from './TasksDisplay'
 import NewTaskForm from "./NewTaskForm";
-import { tasksDisplayStyle } from "../AppStyles";
+import { tasksDisplayStyle } from "../../AppStyles";
 
 const NotDoneTasksDisplay = () => {
   const notDoneTasks = useSelector(store => store.tasks)

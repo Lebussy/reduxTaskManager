@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import taskService from '../services/tasks'
 import taskHelper from './reducerHelpers/tasksHelper'
 import { addToLastDonePosition, addToLastNotDonePosition, setLastDonePosition, setLastNotDonePosition } from "./lastPositionsReducer";
+import {notify} from './notificationReducer'
 
 const taskSlice = createSlice({
   name: 'tasks',
@@ -28,43 +29,56 @@ const taskSlice = createSlice({
 // Synchronous action creators
 export const { appendTask, setTaskData, replaceTask, removeTask } = taskSlice.actions
 
-// Asynchronous action creator for creating a new note from the content passed to it.
-// Performs the server request as well as the dispatch to the store once that has returned the added task
-export const createTask = (content) => {
-  return async (dispatch, getState) => {
-    const nextPosition = getState().lastPositions.notDone + 1
-    const newTask = {content, done: false, position: nextPosition}
-    const created = await taskService.addTask(newTask)
-    dispatch(appendTask(created))
-    dispatch(addToLastNotDonePosition(1))
-  }
-}
-
 // Thunk that first requests the task data from the server, and then with that data updates:
 // - the tasks in the store
 // - the last positions in the done and notDone lists
 export const initialiseTasksData = () => {
   return async (dispatch) => {
     try {
+      // Get requests the tasks from the server
       const taskData = await taskService.getTasks()
+      // Sets the task data in the store
       dispatch(setTaskData(taskData))
+
+      // Calculates the last done positions and sets the data in the store
       const doneTasks = taskData.filter(task => task.done)
       const notDoneTasks = taskData.filter(task => !task.done)
       dispatch(setLastDonePosition(doneTasks.length))
       dispatch(setLastNotDonePosition(notDoneTasks.length))
     } catch (error) {
-      console.log('#################################')
-      console.log(error.response.data.error)
+      dispatch(notify(error.response.data.error, 'ERROR', 5))
     }
   }
 }
+
+// Asynchronous action creator for creating a new note from the content passed to it.
+// Performs the server request as well as the dispatch to the store once that has returned the added task
+export const createTask = (content) => {
+  return async (dispatch, getState) => {
+    const nextPosition = getState().lastPositions.notDone + 1
+    const newTask = {content, done: false, position: nextPosition}
+    try {
+      const created = await taskService.addTask(newTask)
+      dispatch(appendTask(created))
+      dispatch(addToLastNotDonePosition(1))
+      dispatch(notify(`${created.content} added to tasks`, 'SUCCESS', 3))
+    } catch {
+      dispatch(notify('Failed to add task', 'ERROR', 5))
+    }
+  }
+}
+
 
 // Thunk returned by this function dispatches an update request to the server, with the updated task that was passed to it
 // Once the server has responded, the task is replaced in the redux store
 export const updateTask = (updatedTask) => {
   return async (dispatch) => {
-    const returnedTask = await taskService.updateTask(updatedTask)
+    try {
+      const returnedTask = await taskService.updateTask(updatedTask)
     dispatch(replaceTask(returnedTask))
+    } catch (error) {
+      dispatch(notify('Task not updated: ' + error.message, 'ERROR', 5))
+    }
   }
 }
 
@@ -130,8 +144,7 @@ export const deleteTask = (taskToDelete) => {
       dispatch(updateTasksAfterRemoving(taskToDelete))
 
     } catch (error) {
-      console.error(error)
-      console.log('FAILED DELETION')
+      dispatch(notify('Failed to delete task' + error.message, 'ERROR', 5))
     }
   }
 }
@@ -149,7 +162,7 @@ export const changeTaskPosition = (tasks, fromPosition, toPosition) => {
       })
       await taskService.updateMultiple(IDsAndPositions);
     } catch (error) {
-      console.error(error);
+      dispatch(notify('Failed to update task positions' + error.message, 'ERROR', 5))
     }
   }
 }

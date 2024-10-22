@@ -1,8 +1,8 @@
 import { useDispatch } from "react-redux"
 import Task from "./Task"
-import { tasksDisplayStyle } from '../AppStyles'
+import { tasksDisplayStyle } from '../../AppStyles'
 import { DragDropContext, Droppable } from "@hello-pangea/dnd"
-import { changeTaskPosition } from "../reducers/taskReducer"
+import { changeTaskPosition } from "../../reducers/taskReducer"
 
 const TasksDisplay = ({ tasks}) => {
   const dispatch = useDispatch()
