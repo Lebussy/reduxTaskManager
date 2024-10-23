@@ -61,7 +61,6 @@ export const createTask = (content) => {
       const created = await taskService.addTask(newTask)
       dispatch(appendTask(created))
       dispatch(addToLastNotDonePosition(1))
-      dispatch(notify(`${created.content} added to tasks`, 'SUCCESS', 3))
     } catch {
       dispatch(notify('Failed to add task', 'ERROR', 5))
     }
@@ -92,9 +91,11 @@ export const updateTasksAfterRemoving = (taskToRemove) => {
 
     // Transforms the array of tasks to an array of objects containing just the positions and ids
     const shiftedPositions = shiftedTasks.map(task => {
-      return {id: task.id, position: task.position}
+      return {id: task.id, position: task.position, user: task.user}
     })
 
+    console.log('#############shifted positions####################')
+    console.log(shiftedPositions)
     // Batch updates these tasks to the server and waits for the response
     const updatedTasks = await taskService.updateMultiple(shiftedPositions)
 
@@ -158,7 +159,7 @@ export const changeTaskPosition = (tasks, fromPosition, toPosition) => {
       updatedTasks.forEach(task => dispatch(replaceTask(task)));
       // Optimistically update the state before the server confirms the changes
       const IDsAndPositions = updatedTasks.map(task => {
-        return {id: task.id, position: task.position}
+        return {id: task.id, position: task.position, user: task.user}
       })
       await taskService.updateMultiple(IDsAndPositions);
     } catch (error) {
