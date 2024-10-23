@@ -1,12 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { clearNotification, notify } from "./notificationReducer";
+import { notify } from "./notificationReducer";
 import loginService from '../services/login'
 import taskService from '../services/tasks'
+import userHelper from './reducerHelpers/userHelper'
 
 // Slice for storing the user data
 const userSlice = createSlice({
   name:'user',
-  initialState: {loggedIn:false},
+  // Lazy initialiser which reads user data from localstorage if it exists
+  initialState: userHelper.getInitialUserState() || {loggedIn:false},
   reducers: {
     // Sets the user data in the store
     setUser (state, action) {
@@ -29,6 +31,7 @@ export const login = (credentials) => {
       const {username, name, token} = await loginService.login(credentials)
       dispatch(setUser({username, name, token}))
       taskService.setAuthToken(token)
+      window.localStorage.setItem('user', JSON.stringify({username, name, token}))
     } catch (error) {
       dispatch(notify(error.response.data.error, 'Login Failed', 5))
     }
@@ -39,7 +42,7 @@ export const login = (credentials) => {
 export const logOut = () => {
   return async (dispatch) => {
     dispatch(clearUser())
-    dispatch(clearNotification())
+    window.localStorage.removeItem('user')
   }
 }
 

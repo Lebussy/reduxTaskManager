@@ -4,27 +4,26 @@ import { appStyle } from "./AppStyles"
 import TaskListsDiv from "./components/taskComponents/TaskListsDiv"
 import NotificationDisplay from './components/NotificationDisplay'
 import LoginForm from './components/LoginForm'
-import {logOut} from "./reducers/userReducer"
+import tasksService from './services/tasks'
+import LogoutButton from "./components/LogoutButton"
 
 
 const App = () => {
   const dispatch = useDispatch()
 
+  // Gets the user object from the store
   const user = useSelector(store => store.user)
 
-  const renderLogoutButton = () => {
-    return (
-      <>
-        {user.name}
-        <button onClick={()=> dispatch(logOut())}>Logout</button>
-      </>
-    )
+  // If a user is logged in and has a token associated with it, sets the auth token for axios requests
+  if (user.loggedIn && user.token){
+    tasksService.setAuthToken(user.token)
   }
+
 
   return (
     <>
       <div style={appStyle} onClick={() => dispatch(clearIsEdit())}>
-        {user.loggedIn && renderLogoutButton()}
+        {user.loggedIn && <LogoutButton/>}
         <h2>Task Manager Application</h2>
         <NotificationDisplay/>
         {user.loggedIn ? <TaskListsDiv/> : <LoginForm/>}

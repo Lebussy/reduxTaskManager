@@ -13,10 +13,10 @@ const LoginForm = () => {
   return (
     <form onSubmit={handleLogin}>
       <div>
-        <input type='text' name='username'></input>
+        <input type='text' name='username' autoComplete="username"></input>
       </div>
       <div>
-        <input type='password' name='password'></input>
+        <input type='password' name='password' autoComplete="current-password"></input>
       </div>
       <button type="submit">Login</button>
     </form>

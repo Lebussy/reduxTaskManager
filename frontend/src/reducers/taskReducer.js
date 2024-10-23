@@ -3,6 +3,7 @@ import taskService from '../services/tasks'
 import taskHelper from './reducerHelpers/tasksHelper'
 import { addToLastDonePosition, addToLastNotDonePosition, setLastDonePosition, setLastNotDonePosition } from "./lastPositionsReducer";
 import {notify} from './notificationReducer'
+import {logOut} from './userReducer'
 
 const taskSlice = createSlice({
   name: 'tasks',
@@ -46,6 +47,9 @@ export const initialiseTasksData = () => {
       dispatch(setLastDonePosition(doneTasks.length))
       dispatch(setLastNotDonePosition(notDoneTasks.length))
     } catch (error) {
+      if (error.message.includes('401')){
+        dispatch(logOut())
+      }
       dispatch(notify(error.response.data.error, 'ERROR', 5))
     }
   }
@@ -74,7 +78,7 @@ export const updateTask = (updatedTask) => {
   return async (dispatch) => {
     try {
       const returnedTask = await taskService.updateTask(updatedTask)
-    dispatch(replaceTask(returnedTask))
+      dispatch(replaceTask(returnedTask))
     } catch (error) {
       dispatch(notify('Task not updated: ' + error.message, 'ERROR', 5))
     }
@@ -94,8 +98,6 @@ export const updateTasksAfterRemoving = (taskToRemove) => {
       return {id: task.id, position: task.position, user: task.user}
     })
 
-    console.log('#############shifted positions####################')
-    console.log(shiftedPositions)
     // Batch updates these tasks to the server and waits for the response
     const updatedTasks = await taskService.updateMultiple(shiftedPositions)
 

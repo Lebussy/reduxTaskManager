@@ -32,10 +32,17 @@
   - create the login service module to make the axios request DONE
   - create the store for the user data DONE
   - have the task requests use the bearer token DONE
-  - debug the batch updates unauthorised error
+  - debug the batch updates unauthorised error DONE
 - read the next section from the FSO course
+ - we want to save the user to the local storage ect. DONE
+
 - create user form component
-- have the user token sent with the requests to get/post/update ect.
+- have the user token sent with the requests to get/post/update ect DONE
+- store tasks in local storage aswell? re-loading page cleaner
+- if the user token expired, dispatch the logout action DONE
+- make logout action creator not clear notifications DONE
+- create logout button component DONE
+- make logout bttn clear notification instead DONE
 
 
 - test frontend
