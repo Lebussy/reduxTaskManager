@@ -60,13 +60,8 @@ tasksRouter.patch('/batch', async (req, res) => {
   // User making the bulk patch request
   const requestUser = req.user
 
-  console.log('##############req user id###################')
-  console.log(requestUser._id.toString())
-
   // Ensures that the user is authorised to update all the tasks in the request
   if (!tasksToUpdate.every(taskUpdate => {
-    console.log('##############taskUpdate.user###################')
-    console.log(taskUpdate.user)
     // For each of the task updates, ensures that the user making the request is the author
     return taskUpdate.user === requestUser._id.toString()
   })){

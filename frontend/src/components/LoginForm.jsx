@@ -6,11 +6,9 @@ import { useState } from 'react'
 const LoginForm = () => {
   const dispatch = useDispatch()
 
-  const [hasAccount, setHasAccount] = useState(true)
+  const [creatingAccount, setCreatingAccount] = useState(false)
 
   const handleLogin = event => {
-    console.log('#############handlelogin called####################')
-    console.log()
     event.preventDefault()
     const username = event.target.username.value
     const password = event.target.password.value
@@ -27,21 +25,21 @@ const LoginForm = () => {
         <input type='password' name='password' autoComplete="current-password"></input>
       </div>
       <button type="submit">Login</button>
-      <button onClick={() => setHasAccount(false)}>Create Account</button>
+      <button onClick={() => setCreatingAccount(true)}>Create Account</button>
     </form>
     )
   }
 
   const renderUserRegistrationForm = () => {
     return (
-      <TaskUserRegistration goLogin={() => setHasAccount(true)}/>
+      <TaskUserRegistration goLogin={() => setCreatingAccount(false)}/>
     )
   }
 
   return (
     <div>
-      {hasAccount && renderLoginForm()}
-      {!hasAccount && renderUserRegistrationForm()}
+      {!creatingAccount && renderLoginForm()}
+      {creatingAccount && renderUserRegistrationForm()}
     </div>
   )
 }

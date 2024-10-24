@@ -9,12 +9,9 @@ const TaskUserRegistration = ({goLogin}) => {
   const registerUser = async (credentials) => {
     try {
       const userDetails = await userService.submitUser(credentials)
-      console.log('############user created: details#####################')
-      console.log(userDetails)
       dispatch(notify(userDetails.username + "created successfully!", 'USER CREATED', 5))
+      goLogin()
     } catch (error) {
-      console.log('################user not created well#################')
-      console.log(error.message)
       dispatch(notify(error.message + 'User not created', 'ERROR', 5))
     }
   }
@@ -22,7 +19,7 @@ const TaskUserRegistration = ({goLogin}) => {
   return (
     <div>
       <NewUserForm handleSubmit={registerUser}/>
-      <button onClick={() => goLogin()}>Login</button>
+      <button type='button' onClick={() => goLogin()}>Login</button>
     </div>
   )
 }
