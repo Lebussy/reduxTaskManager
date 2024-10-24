@@ -18,20 +18,10 @@ const Task = ({ task }) => {
   const taskContentStyle = task.done
     ? { textDecoration: 'line-through' }
     : {}
-  
-  const renderDisplayDetails = () => {
+
+  if (isEdit){
     return (
-      <>
-        <p style={taskContentStyle} onDoubleClick={() => dispatch(setIsEdit(task.id))}>
-          {task.content + ' '}
-        </p>
-        <button style={buttonStyle} onClick={() => dispatch(toggleDone(task))}>
-          {task.done? 'undo' : 'done'}
-        </button>
-        <button style={buttonStyle} onClick={() => dispatch(deleteTask(task))}>
-          delete
-        </button>
-      </>
+      <EditTaskForm oldTask={task}/>
     )
   }
   
@@ -40,7 +30,15 @@ const Task = ({ task }) => {
       {(provided) => (
         <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
           <div className="task-container">
-            {isEdit ? <EditTaskForm oldTask={task}/> : renderDisplayDetails()  }
+            <p style={taskContentStyle} onDoubleClick={() => dispatch(setIsEdit(task.id))}>
+            {task.content + ' '}
+            </p>
+            <button type='button' style={buttonStyle} onClick={() => dispatch(toggleDone(task))}>
+              {task.done? 'undo' : 'done'}
+            </button>
+            <button type='button' style={buttonStyle} onClick={() => dispatch(deleteTask(task))}>
+              delete
+            </button>
           </div>
         </div>
       )}

@@ -4,6 +4,7 @@ import taskHelper from './reducerHelpers/tasksHelper'
 import { addToLastDonePosition, addToLastNotDonePosition, setLastDonePosition, setLastNotDonePosition } from "./lastPositionsReducer";
 import {notify} from './notificationReducer'
 import {logOut} from './userReducer'
+import { clearIsEdit } from "./isEditReducer";
 
 const taskSlice = createSlice({
   name: 'tasks',
@@ -32,6 +33,7 @@ const taskSlice = createSlice({
 
 // Synchronous action creators
 export const { appendTask, setTaskData, replaceTask, removeTask, clearTasks } = taskSlice.actions
+
 
 // Thunk that first requests the task data from the server, and then with that data updates:
 // - the tasks in the store
@@ -82,6 +84,7 @@ export const updateTask = (updatedTask) => {
     try {
       const returnedTask = await taskService.updateTask(updatedTask)
       dispatch(replaceTask(returnedTask))
+      dispatch(clearIsEdit())
     } catch (error) {
       dispatch(notify('Task not updated: ' + error.message, 'ERROR', 5))
     }

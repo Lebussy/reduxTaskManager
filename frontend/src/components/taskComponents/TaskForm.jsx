@@ -4,7 +4,7 @@
 
 const TaskForm = ({ handleSubmit, preFill = '', placeholder = '' }) => {
   
-// 
+// stop prop only workd on the pure html elements 
   return (
     
     <form  onSubmit={(event) => {
@@ -14,7 +14,7 @@ const TaskForm = ({ handleSubmit, preFill = '', placeholder = '' }) => {
       event.target.task.value = ''
     }}>
       <input onClick={event => event.stopPropagation()} placeholder={placeholder} defaultValue={preFill} type="text" name="task"/>
-      <button type="submit">save</button>
+      <button onClick={event => event.stopPropagation()} type="submit">save</button>
     </form>
   )
 }
