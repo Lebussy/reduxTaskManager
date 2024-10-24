@@ -8,6 +8,7 @@ import mongoose from 'mongoose'
 import config from './utils/config.js'
 import logger from './utils/logger.js'
 import loginRouter from './controllers/login.js'
+import indexRouter from './controllers/index.js'
 
 const app = express()
 
@@ -28,6 +29,9 @@ app.use(cors())
 // Middlewear that parses incoming json payloads from the reqests, and makes available in req.body
 app.use(express.json())
 app.use(middlewear.requestLogger)
+
+// test app route for the index for fly deploying
+app.use('/', indexRouter)
 
 // The route handler for the api/tasks route
 app.use('/api/tasks', tasksRouter)

@@ -4,7 +4,7 @@ import logger from './utils/logger.js'
 import app from './app.js'
 import 'express-async-errors'
 
-await mongoHelper.resetDB()
+//await mongoHelper.resetDB()
 
 app.listen(config.PORT, () => {
   logger.info(`Server running on port ${config.PORT}`)
