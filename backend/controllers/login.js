@@ -35,7 +35,7 @@ loginRouter.post('/', async (req, res) => {
   // The token, signed using the env.secret.
   // - when using jwt and a public key, the signing at the end ensures that the headers and payload have not been tampered with
   // -- when using a secret key, the info in the header and payload are un-tampered, and it is insured that it was signed by the server
-  const token = jwt.sign(userPayloadForToken, process.env.SECRET)
+  const token = jwt.sign(userPayloadForToken, process.env.SECRET, {expiresIn: 60*60})
 
   // Sends the token along with the username and the name of the user back to the client
   res.status(200).json({token, username: user.username, name: user.name})

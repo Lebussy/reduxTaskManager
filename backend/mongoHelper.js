@@ -3,39 +3,32 @@ import Task from './models/task.js'
 import User from './models/user.js'
 import bcrypt from 'bcryptjs'
 
-const initialUser = 
-  {
-    username:'firstUser',
-    name:'bart',
-    password:'SuperStrong!',
-    notes:[]
-  }
+const initialUsers = 
+  [
+    {
+      username:'firstUser',
+      name:'bart',
+      password:'SuperStrong!',
+      notes:[]
+    },
+    {
+      username:'secondUser',
+      name:'maggie',
+      password:'SuperStrong!',
+      notes:[]
+    }
+  ]
 
 const initialisingTasks = [
   {
-    content: 'change routes to persist to mongo',
+    content: 'deploy frontend',
     done: false,
-    position: 1
-  },
-  {
-    content: 'update the patch route to minimise network data',
-    done: false,
-    position: 2
-  },
-  {
-    content: 'change routes to use async/await',
-    done: false,
-    position: 3
-  },
-  {
-    content: 'write mvp frontend',
-    done: true,
     position: 1
   },
   {
     content: 'pick 4 slightly nicer colors for frontend',
     done: true,
-    position: 2
+    position: 1
   }
 ]
 
@@ -45,15 +38,18 @@ const resetDB = async () => {
     // Clears users from the db
     await User.deleteMany({})
     console.log('all users deleted')
-    // Sets up a user to add to db
-    const initialUserWithPasswordHash = 
-    {...initialUser, 
-      passwordHash: await bcrypt.hash(initialUser.password, 10)
+    // Sets up a users to add to db
+    for (const userToAdd of initialUsers){
+      const initialUserWithPasswordHash = 
+      {...userToAdd, 
+        passwordHash: await bcrypt.hash(userToAdd.password, 10)
+      }
+      // Removes the password field
+      delete initialUserWithPasswordHash.password
+      const newUser = new User(initialUserWithPasswordHash)
+      await newUser.save()
     }
-    // Removes the password field
-    delete initialUserWithPasswordHash.password
-    const newUser = new User(initialUserWithPasswordHash)
-    await newUser.save()
+    
   } catch (error) {
     console.error(error, 'could not initialise user')
   }
@@ -64,7 +60,7 @@ const resetDB = async () => {
     await Task.deleteMany({})
     console.log('All tasks deleted')
     // Adds the initial tasks to the database, and concats the id of the new tasks to the array of tasks on the user doc
-    const user = await User.findOne({})
+    const user = await User.findOne({username: initialUsers[0].username})
     for (const task of initialisingTasks){
       const newTask = new Task({...task, user: user.id})
       await newTask.save()

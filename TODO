@@ -33,16 +33,27 @@
   - create the store for the user data DONE
   - have the task requests use the bearer token DONE
   - debug the batch updates unauthorised error DONE
-- read the next section from the FSO course
+
  - we want to save the user to the local storage ect. DONE
 
 - create user form component
 - have the user token sent with the requests to get/post/update ect DONE
-- store tasks in local storage aswell? re-loading page cleaner
+- store tasks in local storage aswell? re-loading page cleaner NO! (will have to update every time the tasks change which will get very slow for many tasks ect.)
 - if the user token expired, dispatch the logout action DONE
 - make logout action creator not clear notifications DONE
 - create logout button component DONE
 - make logout bttn clear notification instead DONE
+- finish init for two users and test DONE
+- have logout reset the store data DONE
+- clicking on the edit box cancels the edit -- COME BACK
+- user creation form DONE
+  - clean up so only login or registration  visible
+    - Read up on conditionally rendering elements as login form 'not connected' now aswell
+  - be fine with very basic - future FSO will cover 
+- read the next section from the FSO course
+- read section on deploying application and creating dist for deploying
+
+- Ask GPT about next project idea, building on what has been done here
 
 
 - test frontend
@@ -51,3 +62,4 @@
 
 SOMEDAY/MAYBE:
   - seperate done/notdone tasks in state so that only relevant tasks are re-rendered on list change
+  - Clean up login and user registration components as very messy currently

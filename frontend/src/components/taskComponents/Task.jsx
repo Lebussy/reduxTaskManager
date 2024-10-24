@@ -40,7 +40,7 @@ const Task = ({ task }) => {
       {(provided) => (
         <div {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
           <div className="task-container">
-            {!isEdit ? renderDisplayDetails() : <EditTaskForm oldTask={task}/> }
+            {isEdit ? <EditTaskForm oldTask={task}/> : renderDisplayDetails()  }
           </div>
         </div>
       )}

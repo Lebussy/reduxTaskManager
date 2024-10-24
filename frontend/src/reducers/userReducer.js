@@ -3,6 +3,9 @@ import { notify } from "./notificationReducer";
 import loginService from '../services/login'
 import taskService from '../services/tasks'
 import userHelper from './reducerHelpers/userHelper'
+import { clearTasks } from "./taskReducer";
+import { clearLastTaskPositions } from "./lastPositionsReducer";
+import { clearIsEdit } from "./isEditReducer";
 
 // Slice for storing the user data
 const userSlice = createSlice({
@@ -43,6 +46,9 @@ export const logOut = () => {
   return async (dispatch) => {
     dispatch(clearUser())
     window.localStorage.removeItem('user')
+    dispatch(clearTasks())
+    dispatch(clearLastTaskPositions())
+    dispatch(clearIsEdit())
   }
 }
 

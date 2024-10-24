@@ -22,7 +22,7 @@ const App = () => {
 
   return (
     <>
-      <div style={appStyle} onClick={() => dispatch(clearIsEdit())}>
+      <div style={appStyle} onClick={() => dispatch(clearIsEdit())} >
         {user.loggedIn && <LogoutButton/>}
         <h2>Task Manager Application</h2>
         <NotificationDisplay/>

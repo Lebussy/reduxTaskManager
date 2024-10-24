@@ -18,11 +18,14 @@ const positionsSlice = createSlice({
     },
     addToLastNotDonePosition(state, action){
       state.notDone += action.payload
+    },
+    clearLastTaskPositions(_state, _action){
+      return {done: 0, notDone: 0}
     }
     
   }
 })
 
-export const { setLastDonePosition, setLastNotDonePosition, addToLastDonePosition, addToLastNotDonePosition } = positionsSlice.actions
+export const { setLastDonePosition, setLastNotDonePosition, addToLastDonePosition, addToLastNotDonePosition, clearLastTaskPositions } = positionsSlice.actions
 
 export default positionsSlice.reducer

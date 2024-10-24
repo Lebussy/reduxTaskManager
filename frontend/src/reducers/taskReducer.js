@@ -7,7 +7,7 @@ import {logOut} from './userReducer'
 
 const taskSlice = createSlice({
   name: 'tasks',
-  initialState: [{content:"loading tasks", done: false, id: "1234", position: 1}],
+  initialState: [],
   reducers: {
     appendTask (state, action) {
       state.push(action.payload)
@@ -23,12 +23,15 @@ const taskSlice = createSlice({
     },
     removeTask (state, action){
       return state.filter(task => task.id !== action.payload)
+    },
+    clearTasks (_state, _action){
+      return []
     }
   }
 })
 
 // Synchronous action creators
-export const { appendTask, setTaskData, replaceTask, removeTask } = taskSlice.actions
+export const { appendTask, setTaskData, replaceTask, removeTask, clearTasks } = taskSlice.actions
 
 // Thunk that first requests the task data from the server, and then with that data updates:
 // - the tasks in the store
