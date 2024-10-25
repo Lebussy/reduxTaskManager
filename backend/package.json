@@ -5,6 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "build:ui": "@powershell rm -r -fo dist && cd ../frontend && npm run build && @powershell cp dist -Recurse ../backend", 
+    "deploy": "@powershell fly deploy",
+    "deploy:full": "npm run build:ui && npm run deploy",
     "start": "node index.js",
     "dev": "cross-env NODE_ENV=development nodemon index.js",
     "test": "cross-env  NODE_ENV=test node --test",
