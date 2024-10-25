@@ -8,7 +8,6 @@ import mongoose from 'mongoose'
 import config from './utils/config.js'
 import logger from './utils/logger.js'
 import loginRouter from './controllers/login.js'
-import indexRouter from './controllers/index.js'
 
 const app = express()
 
@@ -30,8 +29,9 @@ app.use(cors())
 app.use(express.json())
 app.use(middlewear.requestLogger)
 
-// test app route for the index for fly deploying
-app.use('/', indexRouter)
+// Middlewear for express application that serves a static file if a request is made to a resource matching a 
+// resource within 'dist'
+app.use(express.static('dist'))
 
 // The route handler for the api/tasks route
 app.use('/api/tasks', tasksRouter)

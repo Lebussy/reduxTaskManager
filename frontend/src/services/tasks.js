@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const baseUrl = 'http://localhost:3001/api/tasks'
+const baseUrl = '/api/tasks'
 
 // Sets the global authorisation token for requests in this module
 const setAuthToken = (token) => {
