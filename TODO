@@ -48,11 +48,13 @@
 - clicking on the edit box cancels the edit -- DONE
  - BUGFIX: Form stopped not connected error. Clear isEdit was dispatching on the save button. This was removing the form from the DOM before it could submit. Stopping the submition by removing the form from DOM. Stopprop on save button. 
 - user creation form DONE
-  - clean up so only login or registration  visible
-    - Read up on conditionally rendering elements as login form 'not connected' now aswell
-  - be fine with very basic - future FSO will cover 
-- read the next section from the FSO course
-- read section on deploying application and creating dist for deploying
+- read the next section from the FSO course DONE
+- read section on deploying application and creating dist for deploying DONE
+
+- figure out how to make the mongo link different in deploy mode
+- google bug with process env not working with fly
+- test to see if application works in dev mode now 
+  - only reset db in dev mode? DONE
 
 
 
