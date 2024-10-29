@@ -6,6 +6,8 @@ import 'express-async-errors'
 
 if (process.env.NODE_ENV === 'development'){
   await mongoHelper.resetDB()
+  console.log('#############rest db from index####################')
+  console.log()
 }
 
 app.listen(config.PORT, () => {
