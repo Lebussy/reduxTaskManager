@@ -32,10 +32,6 @@ A full-stack task management application with secure authentication, drag-and-dr
 Check out the live demo of the app here:  
 [Task Manager Demo](https://your-demo-link.fly.dev)
 
-## Screenshots
-
-![Task Manager Screenshot](link-to-screenshot.png)
-
 ## Technologies Used
 
 - **Frontend**: React, Redux Toolkit, Pangea DND
