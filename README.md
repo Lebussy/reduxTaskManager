@@ -1,19 +1,19 @@
 # Task Manager App
 
-A full-stack task management application with secure authentication, drag-and-drop task ordering, and full backend testing. Built with **Node.js**, **Express.js**, **MongoDB**, **JWT authentication**, and **React** with **Redux Toolkit** for state management. The app is deployed on **Fly.io**.
+A full-stack task management application with secure authentication, drag-and-drop task ordering, and a full tested backend. Built with **Node.js**, **Express.js**, **MongoDB**, **JWT authentication**, and **React** with **Redux Toolkit** for state management. The app is deployed on **Fly.io**.
 
 ![Task Manager Demo](link-to-gif.gif)
 
 ## Features
 
 - **User Authentication**:  
-  Secure user registration and login using **JWTs** for session management.
+  Secure user registration and authentication using **JWTs**.
   
 - **Task Management**:  
-  Create, update, delete, and reorder tasks. Task order is persistently stored in the database.
+  Create, update, delete, and reorder tasks. Task order persisted to the database.
   
 - **Drag-and-Drop**:  
-  Integrated **Pangea DND** for an intuitive, interactive drag-and-drop interface for task reordering.
+  Integrated **Pangea DND** for an interactive drag-and-drop re-ordering interface.
 
 - **API Testing**:  
   Fully tested backend using **Node:test** and **Supertest** for HTTP route testing.
