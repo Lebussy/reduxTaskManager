@@ -7,11 +7,11 @@ const NotDoneTasksDisplay = () => {
   const notDoneTasks = useSelector(store => store.tasks)
     .filter(task => !task.done)
     .toSorted((a,b) => a.position-b.position)
+  
     
   return (
       <div style={{...tasksDisplayStyle, backgroundColor: '#E0E0E0'}}>
-        <TasksDisplay tasks={notDoneTasks}/>
-        <p></p>
+        {notDoneTasks.length > 0 ? <><TasksDisplay tasks={notDoneTasks}/><p></p></> : <></>}
         <NewTaskForm/>
       </div>
   )

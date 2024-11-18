@@ -19,15 +19,22 @@ const App = () => {
     tasksService.setAuthToken(user.token)
   }
 
-
-  return (
-    <>
+  // Method for rendering the application
+  const renderApplication = () => {
+    return (
       <div style={appStyle} onClick={() => dispatch(clearIsEdit())} >
         {user.loggedIn && <LogoutButton/>}
         <h2>Task Manager Application</h2>
         <NotificationDisplay/>
         {user.loggedIn ? <TaskListsDiv/> : <LoginForm/>}
       </div>
+    )
+  }
+
+
+  return (
+    <>
+      {renderApplication()}
     </>
   )
 }
