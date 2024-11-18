@@ -9,7 +9,7 @@ const TaskUserRegistration = ({goLogin}) => {
   const registerUser = async (credentials) => {
     try {
       const userDetails = await userService.submitUser(credentials)
-      dispatch(notify(userDetails.username + "created successfully!", 'USER CREATED', 5))
+      dispatch(notify(userDetails.username + " created successfully!", 'USER CREATED', 5))
       goLogin()
     } catch (error) {
       dispatch(notify(error.message + 'User not created', 'ERROR', 5))

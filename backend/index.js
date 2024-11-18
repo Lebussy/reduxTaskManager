@@ -10,6 +10,7 @@ if (process.env.NODE_ENV === 'development'){
   console.log()
 }
 
-app.listen(config.PORT, () => {
-  logger.info(`Server running on port ${config.PORT}`)
+const port = process.env.PORT || 3000
+app.listen(port, () => {
+  logger.info(`Server running on port ${port}`)
 })
