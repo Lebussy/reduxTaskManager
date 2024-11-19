@@ -12,8 +12,6 @@ const TaskUserRegistration = ({goLogin}) => {
       dispatch(notify(userDetails.username + " created successfully!", 'USER CREATED', 5))
       goLogin()
     } catch (error) {
-      console.log('#################################')
-      console.log(error)
       dispatch(notify(error.response.data.error + ', user not created', 'ERROR', 10))
     }
   }
