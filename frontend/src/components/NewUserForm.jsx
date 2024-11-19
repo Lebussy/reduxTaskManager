@@ -15,19 +15,19 @@ const NewUserForm = ({handleSubmit}) => {
           <legend>
             Name:
           </legend>
-          <input type='text' name='name'/>
+          <input required={true} type='text' name='name'/>
         </div>
         <div>
           <legend>
             Username:
           </legend>
-          <input type='text' name='username'/>
+          <input required={true} type='text' name='username'/>
         </div>
         <div>
           <legend>
             Password:
           </legend>
-          <input type='password' name='password'/>
+          <input required={true} type='password' name='password'/>
         </div>
         <br></br>
         <button type='submit'>Create User</button>

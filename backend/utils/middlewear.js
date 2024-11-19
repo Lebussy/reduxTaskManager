@@ -12,6 +12,11 @@ const errorHandler = (error, req, res, next) => {
     case 'ValidationError':
       return res.status(400).send({error: error.message})
     case 'MongoServerError':
+      if (error.message.includes('E11000')){
+        console.log('first')
+        return res.status(400).send({error: 'username already taken'})
+      }
+      console.log('second')
       return res.status(400).send({error: error.message})
   }
 
