@@ -1,8 +1,8 @@
 # Task Manager App
 
-A full-stack task management application with secure authentication, drag-and-drop task ordering, and a full tested backend. Built with **Node.js**, **Express.js**, **MongoDB**, **JWT authentication**, and **React** with **Redux Toolkit** for state management. The app is deployed on **Fly.io**.
+A full-stack task management application with secure authentication, drag-and-drop task ordering, and a fully tested backend. Built with **Node.js**, **Express.js**, **MongoDB**, **JWT authentication**, and **React** with **Redux** for state management. The app is deployed on **Fly.io**.
 
-![Task Manager Demo](link-to-gif.gif)
+![Task Manager Demo](/media/TaskAppDem0.gif)
 
 ## Features
 
